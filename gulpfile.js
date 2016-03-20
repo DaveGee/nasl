@@ -1,14 +1,16 @@
 var gulp = require('gulp');
 var browserify = require('browserify');
-var babelify = require('babelify');
 var source = require('vinyl-source-stream');
 var less = require('gulp-less');
 var path = require('path');
 var minifyCSS = require('gulp-minify-css');
 var gutil = require('gulp-util');
+var browserSync = require('browser-sync').create();
 
 var prettyError = function(error) {
-  var msg = error.codeFrame.replace(/\n/g, '\n    ');
+  var msg = error;
+  if (error.codeFrame)
+    msg = error.codeFrame.replace(/\n/g, '\n    ');
 
   gutil.log('|- ' + gutil.colors.bgRed.bold('Build Error in ' + error.plugin));
   gutil.log('|- ' + gutil.colors.bgRed.bold(error.message));
@@ -17,8 +19,7 @@ var prettyError = function(error) {
   gutil.log('|- ' + gutil.colors.bgRed('<<<'));
 
   this.emit('end');
-}
-
+};
 
 gulp.task('build', function() {
   return browserify({
@@ -30,7 +31,8 @@ gulp.task('build', function() {
     .bundle()
     .on('error', prettyError)
     .pipe(source('bundle.js'))
-    .pipe(gulp.dest('dist'));
+    .pipe(gulp.dest('dist'))
+    .pipe(browserSync.stream());
 });
 
 gulp.task('less', function() {
@@ -38,13 +40,22 @@ gulp.task('less', function() {
     .pipe(less({
       paths: [path.join(__dirname, 'less', 'includes')]
     }))
+    .on('error', prettyError)
     .pipe(minifyCSS())
-    .pipe(gulp.dest('dist'));
+    .pipe(gulp.dest('dist'))
+    .pipe(browserSync.stream());
 });
 
-gulp.task('watch', ['build', 'less'], function() {
+gulp.task('serve', ['build', 'less'], function() {
+
+  browserSync.init({
+    server: "./dist"
+  });
+
   gulp.watch('./src/**/*.jsx', ['build']);
   gulp.watch('./src/less/**/*.less', ['less']);
 });
 
-gulp.task('default', ['watch']);
+//gulp.task('jsx-watch', ['build'], browserSync.reload);
+
+gulp.task('default', ['serve']);
