@@ -4,29 +4,39 @@ import ListItem from 'material-ui/lib/lists/list-item';
 import AddShopping from 'material-ui/lib/svg-icons/action/add-shopping-cart';
 import Unknown from 'material-ui/lib/svg-icons/action/help';
 import Avatar from 'material-ui/lib/avatar';
-import EmptyList from './empty-list';
+import Divider from 'material-ui/lib/divider';
+import Subheader from 'material-ui/lib/Subheader';
 
 export default class ProductList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      products: props.products
+      productsToBuy: props.products.filter(p => p.next),
+      allOthers: props.products.filter(p => !p.next)
     };
   }
   
   componentWillMount() { }
   
   render() {
-    var items = this.state.products.map(function(product) {
+    var toItem = function(product) {
       
-      return <ListItem
+      return <ListItem key={product.id}
                 leftAvatar={<Avatar icon={<Unknown />} />}
                 rightIcon={<AddShopping />}
-                primaryText={product}
-                secondaryText="01/01/1970" />;
-    });
+                primaryText={product.name}
+                secondaryText={product.lastBuy ? product.lastBuy.toString() : '-'} />;
+    };
     
-    return this.state.products.length ? 
-      <List>{items}</List> : <EmptyList />;
+    return <div>
+        <List>
+          <Subheader>Bientôt à court!</Subheader>
+          {this.state.productsToBuy.map(toItem)}
+        </List>
+        <Divider />
+        <List>
+          {this.state.allOthers.map(toItem)}
+        </List>
+      </div>;
   }
 }
