@@ -1,18 +1,16 @@
 import React from 'react';
 import List from 'material-ui/lib/lists/list';
-import ListItem from 'material-ui/lib/lists/list-item';
-import AddShopping from 'material-ui/lib/svg-icons/action/add-shopping-cart';
-import Unknown from 'material-ui/lib/svg-icons/action/help';
-import Avatar from 'material-ui/lib/avatar';
 import Divider from 'material-ui/lib/divider';
 import Subheader from 'material-ui/lib/Subheader';
+import ProductItem from './product-item';
+
 
 export default class ProductList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      productsToBuy: props.products.filter(p => p.next),
-      allOthers: props.products.filter(p => !p.next)
+      myList: props.products.filter(p => !!p.lastBuy),
+      allProducts: props.products.filter(p => !!!p.lastBuy)
     };
   }
   
@@ -20,22 +18,28 @@ export default class ProductList extends React.Component {
   
   render() {
     var toItem = function(product) {
+      // actions : 
+      // sur tous : "je viens d'en acheter", "il en faut dès que possible"
       
-      return <ListItem key={product.id}
-                leftAvatar={<Avatar icon={<Unknown />} />}
-                rightIcon={<AddShopping />}
-                primaryText={product.name}
-                secondaryText={product.lastBuy ? product.lastBuy.toString() : '-'} />;
+      // filtres : 
+      //    bientôt à court
+      //    acheté récemment (et par qui)
+      
+      // tri : par needed, lastBuy
+      
+      return <ProductItem key={product.id}
+                  product={product} />;
     };
     
     return <div>
         <List>
-          <Subheader>Bientôt à court!</Subheader>
-          {this.state.productsToBuy.map(toItem)}
+          <Subheader inset={true}>Ma liste habituelle</Subheader>
+          {this.state.myList.map(toItem)}
         </List>
-        <Divider />
+        <Divider inset={true} />
+        <Subheader inset={true}>Tous les autres produits</Subheader>
         <List>
-          {this.state.allOthers.map(toItem)}
+          {this.state.allProducts.map(toItem)}
         </List>
       </div>;
   }
