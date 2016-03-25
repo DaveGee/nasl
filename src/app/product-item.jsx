@@ -2,15 +2,18 @@
 import React from 'react';
 import ListItem from 'material-ui/lib/lists/list-item';
 import IconButton from 'material-ui/lib/icon-button';
-import MoreVertIcon from 'material-ui/lib/svg-icons/navigation/more-vert';
-import BoughtIcon from 'material-ui/lib/svg-icons/action/done';
-import NeededIcon from 'material-ui/lib/svg-icons/alert/error-outline';
+import FontIcon from 'material-ui/lib/font-icon';
 import IconMenu from 'material-ui/lib/menus/icon-menu';
 import MenuItem from 'material-ui/lib/menus/menu-item';
 import Unknown from 'material-ui/lib/svg-icons/action/help';
 import Avatar from 'material-ui/lib/avatar';
+import {grey400, red600, teal600} from 'material-ui/lib/styles/colors';
 
 const BOUGHT = 'boughtSome', NEEDED = 'needed';
+
+const boughtIcon = <FontIcon className="material-icons" color={teal600}>check_circle</FontIcon>;
+const neededIcon = <FontIcon className="material-icons" color={red600}>report_problem</FontIcon>;
+const vertIcon = <FontIcon className="material-icons" color={grey400}>more_vert</FontIcon>;
 
 export default class ProductItem extends React.Component {
 
@@ -51,11 +54,11 @@ export default class ProductItem extends React.Component {
   render() {
     let lastBuyDate = this.state.product.lastBuy ? 'Dernier achat: ' + this.state.product.lastBuy.format('Do MMM.') : 'Jamais acheté';
 
-    let icon = <MoreVertIcon />;
+    let icon = vertIcon;
     if (this.state.action.some(a => a === NEEDED))
-      icon = <NeededIcon />;
+      icon = neededIcon;
     else if (this.state.action.some(a => a === BOUGHT))
-      icon = <BoughtIcon />;
+      icon = boughtIcon;
 
     let iconButtonElement = (
       <IconButton touch={true}>
@@ -68,8 +71,8 @@ export default class ProductItem extends React.Component {
           onChange={this.handleChange.bind(this) }
           value={this.state.action}
           multiple={true}>
-        <MenuItem value="boughtSome" primaryText="J'en ai acheté c'est bon" leftIcon={<BoughtIcon />} />
-        <MenuItem value="needed" primaryText="Il en faut absolument" leftIcon={<NeededIcon />} />
+        <MenuItem value="boughtSome" primaryText="J'en ai acheté c'est bon" leftIcon={boughtIcon} />
+        <MenuItem value="needed" primaryText="Il en faut absolument" leftIcon={neededIcon} />
       </IconMenu>
     );
 

@@ -2,6 +2,7 @@ import React from 'react';
 import List from 'material-ui/lib/lists/list';
 import Divider from 'material-ui/lib/divider';
 import Subheader from 'material-ui/lib/Subheader';
+import AppBar from 'material-ui/lib/app-bar';
 import ProductItem from './product-item';
 
 
@@ -32,6 +33,7 @@ export default class ProductList extends React.Component {
     };
     
     return <div>
+        <AppBar title="Les courses" />
         <List>
           <Subheader inset={true}>Ma liste habituelle</Subheader>
           {this.state.myList.map(toItem)}
