@@ -15,16 +15,7 @@ export default class ProductList extends React.Component {
   }
 
   render() {
-    var toItem = function(product) {
-      // actions : 
-      // sur tous : "je viens d'en acheter", "il en faut dès que possible"
-
-      // filtres : 
-      //    bientôt à court
-      //    acheté récemment (et par qui)
-
-      // tri : par needed, lastBuy
-
+    var toItem = (product) => {
       return <ProductItem key={product.id}
         product={product} />;
     };
@@ -32,12 +23,12 @@ export default class ProductList extends React.Component {
     return <div>
       <List>
         <Subheader inset={true}>Ma liste habituelle</Subheader>
-        {this.props.products.filter(p => !!p.lastBuy).map(toItem) }
+        {this.props.products.filter(p => !!p.lastBuyTime).map(toItem) }
       </List>
       <Divider inset={true} />
       <List>
         <Subheader inset={true}>Tous les autres produits</Subheader>
-        {this.props.products.filter(p => !!!p.lastBuy).map(toItem) }
+        {this.props.products.filter(p => !!!p.lastBuyTime).map(toItem) }
       </List>
     </div >;
   }

@@ -7,6 +7,7 @@ import MenuItem from 'material-ui/lib/menus/menu-item';
 import Unknown from 'material-ui/lib/svg-icons/action/help';
 import Avatar from 'material-ui/lib/avatar';
 import {grey400, red600, teal600} from 'material-ui/lib/styles/colors';
+import moment from 'moment';
 
 const BOUGHT = 'boughtSome', NEEDED = 'needed';
 
@@ -51,7 +52,7 @@ export default class ProductItem extends React.Component {
   }
 
   render() {
-    let lastBuyDate = this.state.product.lastBuy ? 'Dernier achat: ' + this.state.product.lastBuy.format('Do MMM.') : 'Jamais acheté';
+    let lastBuyDate = this.state.product.lastBuyTime ? 'Dernier achat: ' + moment(this.state.product.lastBuyTime).format('Do MMM.') : 'Jamais acheté';
 
     let icon = vertIcon;
     if (this.state.action.some(a => a === NEEDED))

@@ -23,7 +23,7 @@ export function addProduct(name) {
     // common props
     id: getNextId(),
     name: name,
-    lastBuy: null,
+    lastBuyTime: null,
     image: null,
     
     // personalized props 
