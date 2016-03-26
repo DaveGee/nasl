@@ -21,10 +21,29 @@ var prettyError = function(error) {
   this.emit('end');
 };
 
+var libs = [];
+
+gulp.task('libs', function() {
+
+  var b = browserify({
+    debug: false
+  });
+
+  b.add('node_modules/whatwg-fetch/fetch.js');
+  libs.forEach(function(lib) {
+    b.require(lib);
+  });
+
+  return b.bundle()
+    .on('error', prettyError)
+    .pipe(source('libs.js'))
+    .pipe(gulp.dest('./dist'));
+});
+
 gulp.task('build', function() {
   return browserify({
     entries: './src/app.jsx',
-    extensions: ['.jsx'],
+    extensions: ['.jsx', '.js'],
     debug: true
   })
     .transform('babelify', { presets: ['es2015', 'react'] })
@@ -46,16 +65,14 @@ gulp.task('less', function() {
     .pipe(browserSync.stream());
 });
 
-gulp.task('serve', ['build', 'less'], function() {
+gulp.task('serve', ['libs', 'build', 'less'], function() {
 
   browserSync.init({
     server: "./dist"
   });
-
+  
   gulp.watch('./src/app/**/*.js*', ['build']);
   gulp.watch('./src/less/**/*.less', ['less']);
 });
-
-//gulp.task('jsx-watch', ['build'], browserSync.reload);
 
 gulp.task('default', ['serve']);

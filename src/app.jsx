@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDom from 'react-dom';
+import Header from './app/header';
 import ProductList from './app/product-list';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
