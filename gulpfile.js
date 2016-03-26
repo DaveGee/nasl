@@ -52,7 +52,7 @@ gulp.task('serve', ['build', 'less'], function() {
     server: "./dist"
   });
 
-  gulp.watch('./src/**/*.jsx', ['build']);
+  gulp.watch('./src/app/**/*.js*', ['build']);
   gulp.watch('./src/less/**/*.less', ['less']);
 });
 

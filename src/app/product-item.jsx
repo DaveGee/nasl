@@ -1,4 +1,3 @@
-
 import React from 'react';
 import ListItem from 'material-ui/lib/lists/list-item';
 import IconButton from 'material-ui/lib/icon-button';
@@ -77,7 +76,7 @@ export default class ProductItem extends React.Component {
     );
 
     return <ListItem key={this.state.product.id}
-                     leftAvatar={<Avatar icon={<Unknown />} />}
+                     leftAvatar={<Avatar src={this.state.product.image} />}
                      rightIconButton={rightIconMenu}
                      primaryText={this.state.product.name}
                      secondaryText={lastBuyDate}
