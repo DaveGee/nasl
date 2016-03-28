@@ -1,14 +1,15 @@
 import moment from 'moment';
 import B from './backendless';
 import Config from '../../config';
+import {normalize} from './strings';
 
 export function getMoreProducts(offset) {
   return B.fetch({
-                    table: 'products',
-                    props: ['objectId', 'image', 'name'],
-                    order: ['name'],
-                    startAt: offset || 0
-                  }, false)
+    table: 'products',
+    props: ['objectId', 'image', 'name'],
+    order: ['name'],
+    startAt: offset || 0
+  }, false)
     .then(function(response) {
       return {
         data: response.data,
@@ -20,10 +21,10 @@ export function getMoreProducts(offset) {
 
 export function getAllProducts() {
   return B.fetch({
-                    table: 'products',
-                    props: ['objectId', 'image', 'name'],
-                    order: ['name']
-                  }, true);
+    table: 'products',
+    props: ['objectId', 'image', 'name'],
+    order: ['name']
+  }, true);
 }
 
 export function getMyList() {
@@ -35,23 +36,28 @@ export function getMyList() {
 };
 
 export function addProduct(name) {
-  let found = products.find(p => p.name == name);
 
-  if (found) return found;
+  // find by name
+  // if not found, create product with owner = me
+  // add/update to my list (+needed)
 
-  let newProduct = {
-    // common props
-    id: getNextId(),
-    name: name,
-    lastBuyTime: null,
-    image: null,
-
-    // personalized props 
-    needed: true,
-    bought: false
-  };
-
-  //products.push(newProduct);
-
-  return newProduct;
+  B.fetch({
+            table: 'products',
+            props: ['objectId', 'name', 'normalizedName'],
+            filter: { colName: 'normalizedName', value: normalize(name) }
+          }, false)
+    .then(response => {
+      if (response.totalObjects === 0)
+        return B.createProduct({
+                                name: name,
+                                normalizedName: normalize(name),
+                                image: null
+                              }); // create object with owner
+      else
+        return response.data[0]; // return first found
+    })
+    .then(theProduct => {
+      // add or create record in my list related to this object
+      console.log(theProduct);
+    });
 }

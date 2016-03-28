@@ -1,4 +1,5 @@
 import Config from '../../config';
+import Security from './security';
 
 var handleErrors = function(response) {
   if (response.status >= 200 && response.status < 300) {
@@ -26,23 +27,46 @@ class Backendless {
         body: JSON.stringify(credentials)
       })
       .then(response => handleErrors(response))
+      .then(response => response.json())
       .then(userData => {
         return {
+          userId: userData["objectId"],
           userToken: userData['user-token'],
           name: userData['name'],
           email: userData['email']
         }
       });
   }
-
+  
+  createProduct(product) {
+    return fetch(`${this.root}/data/products`, {
+      method: 'post',
+      headers: Object.assign({}, Config.backendless.headers, {"user-token": Security.user.userToken}),
+      body: JSON.stringify(product)
+    })
+    .then(response => response.json());
+  }
+  
+  /*
+    params: {
+              table: 'products',
+              props: ['objectId', 'image', 'name'],
+              order: ['name'],
+              filter: { colName: 'name', value: 'xx'}
+            }
+  */
   fetch(params, all = true) {
     let reqParams = {
-      headers: Object.assign({}, Config.backendless.headers)
+      headers: Object.assign({}, Config.backendless.headers, {"user-token": Security.user.userToken})
     };
-    let props = params.props.join(',');
-    let sort = params.order.join(',');
-    let offset = all ? '' : '&offset=' + params.startAt;
-    let startUrl = `${this.root}/data/${params.table}?pageSize=${Config.defaultPageSize}&props=${props}&sortBy=${sort}${offset}`;
+    let props = params.props ? '&props=' + params.props.join(',') : '';
+    let sort = params.order ? '&sortBy=' + params.order.join(',') : '';
+    let offset = all ? '' : '&offset=' + (params.startAt || 0);
+    let where = escape(`(ownerId is null or ownerId='${Security.user.userId}')`);
+    if (params.filter)
+      where += ` and ${params.filter.colName}='${params.filter.value}'`;
+      
+    let startUrl = `${this.root}/data/${params.table}?pageSize=${Config.defaultPageSize}${props}${sort}${offset}&where=${where}`;
 
     if (all) {
       var data = [];

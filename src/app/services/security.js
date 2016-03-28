@@ -6,9 +6,18 @@ class Security {
     
   }
   
+  get user() {
+    return this._user;
+  }
+  
   auth() {
     //TODO: replace this by real user auth    
-    return B.login(Config.TMPUser);
+    return B.login(Config.TMPUser)
+      .then(userData => {
+        //TODO: map another structure of user (backendless => custom for this app ?)
+        this._user = userData;
+        return userData;
+      });
   }
 }
 
