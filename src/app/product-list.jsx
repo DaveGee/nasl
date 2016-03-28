@@ -33,6 +33,7 @@ export default class ProductList extends React.Component {
   }
 
   componentWillMount() {
+    
     // fetch list products quickly then load
     // background fetch rest of products trankouil
 
@@ -41,7 +42,7 @@ export default class ProductList extends React.Component {
     //   this.nextDataOffset = products.nextDataOffset;
     // });
     
-    getAllProducts().then(data => this.setState({ products: data }));
+    //getAllProducts().then(data => this.setState({ products: data }));
   }
   componentWillUnmount() {
 
