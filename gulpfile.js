@@ -71,7 +71,7 @@ gulp.task('serve', ['libs', 'build', 'less'], function() {
     server: "./dist"
   });
   
-  gulp.watch('./src/app/**/*.js*', ['build']);
+  gulp.watch('./src/**/*.js*', ['build']);
   gulp.watch('./src/less/**/*.less', ['less']);
 });
 

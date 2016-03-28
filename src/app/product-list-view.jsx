@@ -16,7 +16,7 @@ export default class ProductList extends React.Component {
 
   render() {
     var toItem = (product) => {
-      return <ProductItem key={product.id}
+      return <ProductItem key={product.objectId}
         product={product} />;
     };
 

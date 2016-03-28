@@ -33,7 +33,15 @@ export default class ProductList extends React.Component {
   }
 
   componentWillMount() {
-    getAllProducts().then(data => this.setState({ products: data.sort(productSorter) }));
+    // fetch list products quickly then load
+    // background fetch rest of products trankouil
+
+    // getMoreProducts(0).then(products => {
+    //   this.setState({ products: products.data });
+    //   this.nextDataOffset = products.nextDataOffset;
+    // });
+    
+    getAllProducts().then(data => this.setState({ products: data }));
   }
   componentWillUnmount() {
 
