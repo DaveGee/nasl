@@ -38,11 +38,11 @@ class Backendless {
       });
   }
   
-  createProduct(product) {
-    return fetch(`${this.root}/data/products`, {
+  create(tableName, item) {
+    return fetch(`${this.root}/data/${tableName}`, {
       method: 'post',
       headers: Object.assign({}, Config.backendless.headers, {"user-token": Security.user.userToken}),
-      body: JSON.stringify(product)
+      body: JSON.stringify(item)
     })
     .then(response => response.json());
   }

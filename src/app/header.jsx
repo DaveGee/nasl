@@ -15,8 +15,8 @@ export default class Header extends React.Component {
     };
   }
 
-  addItem() {
-    addProduct(this._autoComplete.state.searchText);
+  addItem(selected = null) {
+    addProduct(selected || this._autoComplete.state.searchText);
     this.closeDialog();
   }
 
@@ -26,6 +26,10 @@ export default class Header extends React.Component {
 
   closeDialog() {
     this.setState({ addingItem: false });
+  }
+  
+  handleRequest(selected) {
+    this.addItem(selected);
   }
 
   render() {
@@ -61,6 +65,8 @@ export default class Header extends React.Component {
         onRequestClose={this.closeDialog.bind(this) }
         >
         <AutoComplete
+          onNewRequest={this.handleRequest.bind(this)}
+          maxSearchResults={5}
           hintText="De quoi avez-vous besoin ?"
           dataSource={this.props.products }
           filter={AutoComplete.fuzzyFilter}

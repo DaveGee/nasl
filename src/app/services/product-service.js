@@ -48,11 +48,11 @@ export function addProduct(name) {
           }, false)
     .then(response => {
       if (response.totalObjects === 0)
-        return B.createProduct({
-                                name: name,
-                                normalizedName: normalize(name),
-                                image: null
-                              }); // create object with owner
+        return B.create('products', {
+                         name: name,
+                         normalizedName: normalize(name),
+                         image: null
+                       }); // create object with owner
       else
         return response.data[0]; // return first found
     })
