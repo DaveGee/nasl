@@ -15,8 +15,8 @@ export default class Header extends React.Component {
     };
   }
 
-  addItem(selected = null) {
-    addProduct(selected || this._autoComplete.state.searchText);
+  addItem(selected) {
+    addProduct(selected);
     this.closeDialog();
   }
 
@@ -30,6 +30,10 @@ export default class Header extends React.Component {
   
   handleRequest(selected) {
     this.addItem(selected);
+  }
+  
+  handleDialogOk() {
+    this.addItem(this._autoComplete.state.searchText);
   }
 
   render() {
@@ -49,7 +53,7 @@ export default class Header extends React.Component {
         label="Ajouter"
         primary={true}
         keyboardFocused={true}
-        onTouchTap={this.addItem.bind(this) }
+        onTouchTap={this.handleDialogOk.bind(this) }
         />,
     ];
 

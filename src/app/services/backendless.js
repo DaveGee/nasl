@@ -38,6 +38,15 @@ class Backendless {
       });
   }
   
+  update(tableName, itemId, itemProps) {
+    return fetch(`${this.root}/data/${tableName}/${itemId}`, {
+      method: 'put',
+      headers: Object.assign({}, Config.backendless.headers, {'user-token': Security.user.userToken}),
+      body: JSON.stringify(itemProps)
+    })
+    .then(response => response.json());
+  }
+  
   create(tableName, item) {
     return fetch(`${this.root}/data/${tableName}`, {
       method: 'post',
