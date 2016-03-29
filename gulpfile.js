@@ -1,76 +1,78 @@
 var gulp = require('gulp');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
+var buffer = require('vinyl-buffer');
 var less = require('gulp-less');
 var path = require('path');
 var minifyCSS = require('gulp-minify-css');
-var gutil = require('gulp-util');
 var browserSync = require('browser-sync').create();
-
-var prettyError = function(error) {
-  var msg = error;
-  if (error.codeFrame)
-    msg = error.codeFrame.replace(/\n/g, '\n    ');
-
-  gutil.log('|- ' + gutil.colors.bgRed.bold('Build Error in ' + error.plugin));
-  gutil.log('|- ' + gutil.colors.bgRed.bold(error.message));
-  gutil.log('|- ' + gutil.colors.bgRed('>>>'));
-  gutil.log('|\n    ' + msg + '\n           |');
-  gutil.log('|- ' + gutil.colors.bgRed('<<<'));
-
-  this.emit('end');
-};
-
-var libs = [];
+var prettyError = require('./build/build-utils');
+var config = require('./build/config');
+var uglify = require('gulp-uglify');
+var htmlReplace = require('gulp-html-replace');
 
 gulp.task('libs', function() {
-
   var b = browserify({
     debug: false
   });
-
-  b.add('node_modules/whatwg-fetch/fetch.js');
-  libs.forEach(function(lib) {
+  
+  config.polyfills.forEach(function(p) {
+    b.add(p);
+  });
+  
+  config.libs.forEach(function(lib) {
     b.require(lib);
   });
 
-  return b.bundle()
+  return libs = b.bundle()
     .on('error', prettyError)
-    .pipe(source('libs.js'))
-    .pipe(gulp.dest('./dist'));
+    .pipe(source(config.libsDest))
+    .pipe(buffer()) // mandatory for uglify..
+    .pipe(uglify())
+    .pipe(gulp.dest(config.rootDir));
 });
 
 gulp.task('build', function() {
   return browserify({
-    entries: './src/app.jsx',
+    entries: config.src.react,
     extensions: ['.jsx', '.js'],
     debug: true
   })
     .transform('babelify', { presets: ['es2015', 'react'] })
     .bundle()
     .on('error', prettyError)
-    .pipe(source('bundle.js'))
-    .pipe(gulp.dest('dist'))
+    .pipe(source(config.bundleDest))
+    .pipe(gulp.dest(config.rootDir))
     .pipe(browserSync.stream());
 });
 
 gulp.task('less', function() {
-  return gulp.src('./src/less/main.less')
+  return gulp.src(config.src.less)
     .pipe(less({
       paths: [path.join(__dirname, 'less', 'includes')]
     }))
     .on('error', prettyError)
     .pipe(minifyCSS())
-    .pipe(gulp.dest('dist'))
+    .pipe(gulp.dest(config.rootDir))
     .pipe(browserSync.stream());
 });
 
-gulp.task('serve', ['libs', 'build', 'less'], function() {
+gulp.task('html', function() {
+  return gulp.src(config.src.html)
+    .pipe(htmlReplace({
+      'css': config.cssDest,
+      'js': [config.libsDest, config.bundleDest]
+    }))
+    .pipe(gulp.dest(config.rootDir));
+});
+
+gulp.task('serve', ['libs', 'build', 'less', 'html'], function() {
 
   browserSync.init({
-    server: "./dist"
+    server: config.rootDir
   });
-  
+
+  gulp.watch('./src/index.html', ['html']);
   gulp.watch('./src/**/*.js*', ['build']);
   gulp.watch('./src/less/**/*.less', ['less']);
 });
