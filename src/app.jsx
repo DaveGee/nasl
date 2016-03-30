@@ -20,17 +20,27 @@ Security.auth()
     );    
   })
   .catch(error => {
-    error.response.json()
-      .then(body => {
-        ReactDom.render(
-          <Dialog
-            title="Error at login"
-            modal={true}
-            open={true}
-          >
-            {body.code}: {body.message}
-          </Dialog>,          
-          document.querySelector('.root')
-        );
-      });
+    
+    function renderError(code, message) {
+      ReactDom.render(
+            <Dialog
+              title="Error at login"
+              modal={true}
+              open={true}
+            >
+              {code}: {message}
+            </Dialog>,          
+            document.querySelector('.root')
+          );
+    } 
+    
+    if(error.response) {
+      error.response.json()
+        .then(body => renderError(body.code, body.message));
+      throw error;
+    }
+     else {
+      renderError(0, error.message);
+      throw error;
+     }
   });

@@ -1,5 +1,6 @@
 import Config from '../../config';
 import Security from './security';
+import {encode} from '../helpers/strings';
 
 var handleErrors = function(response) {
   if (response.status >= 200 && response.status < 300) {
@@ -33,9 +34,35 @@ class Backendless {
           userId: userData["objectId"],
           userToken: userData['user-token'],
           name: userData['name'],
-          email: userData['email']
+          email: userData['email'],
+          listRef: userData['listRef']
         }
       });
+  }
+  
+  checkSession(userToken, username) {
+    return fetch(this.root + '/users/isvalidusertoken/' + userToken, {
+      headers: Config.backendless.headers
+    })
+    .then(response => response.json())
+    .then(response => {
+      if(response)
+        return fetch(this.root + '/data/users?where=' + encode(`email='${username}'`), {
+          headers: Config.backendless.headers
+        })
+        .then(response => response.json())
+        .then(response => {
+          return {
+            userId: response.data[0].objectId,
+            userToken: userToken,
+            name: response.data[0].name,
+            email: response.data[0].email,
+            listRef: response.data[0].listRef
+          };
+        });
+       else 
+        throw "Invalid security token";
+    })
   }
   
   update(tableName, itemId, itemProps) {
@@ -71,9 +98,9 @@ class Backendless {
     let props = params.props ? '&props=' + params.props.join(',') : '';
     let sort = params.order ? '&sortBy=' + params.order.join(',') : '';
     let offset = all ? '' : '&offset=' + (params.startAt || 0);
-    let where = escape(`(ownerId is null or ownerId='${Security.user.userId}')`);
-    if (params.filter)
-      where += ` and ${params.filter.colName}='${params.filter.value}'`;
+    
+    let filters = (params.filters || []).map(f => `${f.colName}='${f.value}'`);
+    let where = [params.where, ...filters].filter(w => !!w).join(' and ');
       
     let startUrl = `${this.root}/data/${params.table}?pageSize=${Config.defaultPageSize}${props}${sort}${offset}&where=${where}`;
 

@@ -1,12 +1,15 @@
 import moment from 'moment';
 import B from './backendless';
 import Config from '../../config';
-import {normalize} from './strings';
+import {normalize} from '../helpers/strings';
+import Security from './security';
+import Enums from '../helpers/enums';
 
 export function getMoreProducts(offset) {
   return B.fetch({
     table: 'products',
     props: ['objectId', 'image', 'name'],
+    where: `(ownerId is null or ownerId='${Security.user.userId}')`,
     order: ['name'],
     startAt: offset || 0
   }, false)
@@ -23,17 +26,41 @@ export function getAllProducts() {
   return B.fetch({
     table: 'products',
     props: ['objectId', 'image', 'name'],
+    where: `(ownerId is null or ownerId='${Security.user.userId}')`,
     order: ['name']
   }, true);
 }
 
-export function getMyList() {
-  return B.fetchAll({
-    table: 'shoplist',
-    props: [],
-    order: []
-  }, true);
-};
+export function setItemState(productId, state) {
+  // get shop list item by product id in my list
+    // if doesn't exist, create
+    // if exists, change state 
+  
+      
+  // exists in my shoplist ?
+  return B.fetch({
+    table: 'shopListItems',
+    props: ['state', 'lastBuyTime', 'objectId', 'productId', 'listRef'],
+    filters: [
+      { colName: 'productId', value: productId },
+      { colName: 'listRef', value: Security.user.listRef }
+    ]
+  }, false)
+  
+  // item found in shoplist ? (404 if shoplist does not exist)
+  .then(response => {
+    
+    if(!response.totalObjects || response.totalObjects === 0)
+      return B.create('shopListItems', {
+        productId: productId,
+        state: state,
+        lastBuyTime: null,
+        listRef: Security.user.listRef
+      });
+    else
+      return B.update('shopListItems', response.data[0].objectId, { state: state });
+  });
+}
 
 export function addProduct(name) {
 
@@ -44,7 +71,8 @@ export function addProduct(name) {
   return B.fetch({
             table: 'products',
             props: ['objectId', 'name', 'normalizedName'],
-            filter: { colName: 'normalizedName', value: normalize(name) }
+            where: `(ownerId is null or ownerId='${Security.user.userId}')`,
+            filters: [{ colName: 'normalizedName', value: normalize(name) }]
           }, false)
     // product found ?      
     .then(response => {
@@ -59,26 +87,5 @@ export function addProduct(name) {
         return response.data[0]; // return first found
     })
     // product created or retrieved...
-    .then(theProduct => {
-      
-      // exists in my shoplist ?
-      return B.fetch({
-        table: 'shoplists',
-        props: ['needed', 'lastBuyTime', 'objectId', 'productId'],
-        filter: { colName: 'productId', value: theProduct.objectId }
-      }, false)
-      
-      // item found in shoplist ? (404 if shoplist does not exist)
-      .then(response => {
-        
-        if(!response.totalObjects || response.totalObjects === 0)
-          return B.create('shoplists', {
-            productId: theProduct.objectId,
-            needed: true,
-            lastBuyTime: null
-          });
-        else
-          return B.update('shoplists', response.data[0].objectId, { needed: true });
-      });
-    });
+    .then(product => setItemState(product.objectId, Enums.ItemState.Needed));
 }
