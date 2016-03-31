@@ -36,11 +36,12 @@ export function setItemState(productId, state) {
     // if doesn't exist, create
     // if exists, change state 
   
+  let now = new Date().toISOString();
       
   // exists in my shoplist ?
   return B.fetch({
     table: 'shopListItems',
-    props: ['state', 'lastBuyTime', 'objectId', 'productId', 'listRef'],
+    props: ['needed', 'lastBuyTime', 'objectId', 'productId', 'listRef'],
     filters: [
       { colName: 'productId', value: productId },
       { colName: 'listRef', value: Security.user.listRef }
@@ -53,12 +54,16 @@ export function setItemState(productId, state) {
     if(!response.totalObjects || response.totalObjects === 0)
       return B.create('shopListItems', {
         productId: productId,
-        state: state,
-        lastBuyTime: null,
+        needed: state === Enums.ItemState.Needed, 
+        lastBuyTime: state === Enums.ItemState.Bought ? now : null,
         listRef: Security.user.listRef
       });
     else
-      return B.update('shopListItems', response.data[0].objectId, { state: state });
+      return B.update('shopListItems', response.data[0].objectId, 
+        { 
+          needed: state === Enums.ItemState.Needed, 
+          lastBuyTime: state === Enums.ItemState.Bought ? now : null
+        });
   });
 }
 
