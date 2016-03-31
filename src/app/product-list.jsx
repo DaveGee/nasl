@@ -14,13 +14,15 @@ import { getAllProducts, getShoppingList } from './services/product-service';
 // tri : par needed, lastBuy
 function productSorter(a, b) {
   // if < 0 => a smaller. if > 0 => b smaller
+  let aState = a.shopStatus || { needed: false, lastBuyTime: null };
+  let bState = b.shopStatus || { needed: false, lastBuyTime: null };
   
   // products marked as "needed" are always on top
-  let needed = !!b.flagNeeded - !!a.flagNeeded;
+  let needed = !!bState.needed - !!aState.needed;
   if(needed !== 0) return needed;
   
   // products almost empty are sorted by emptyness
-  return new Date(b.lastBuyTime) - new Date(a.lastBuyTime);
+  return new Date(bState.lastBuyTime) - new Date(aState.lastBuyTime);
 }
 
 export default class ProductList extends React.Component {
@@ -41,7 +43,7 @@ export default class ProductList extends React.Component {
       if (product) product.shopStatus = s;  
     });
     
-    return products;
+    return products.sort(productSorter);
   }
 
   componentWillMount() {
@@ -60,7 +62,8 @@ export default class ProductList extends React.Component {
   loadData() {
     return getAllProducts()
       .then(products => {
-        return getShoppingList().then(list => this.matchProducts(products, list));
+        return getShoppingList()
+          .then(list => this.matchProducts(products, list));
       })
       .then(data => this.setState({ products: data }));
   }

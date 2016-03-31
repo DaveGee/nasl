@@ -62,7 +62,11 @@ export function setItemBoughtNotNeeded(shopListItem) {
     return B.update('shopListItems', shopListItem.objectId, 
                     {
                       needed: false,
-                      lastBuyTime: boughtRecently(shopListItem.lastBuyTime) ? shopListItem.lastBuyTime : now
+                      lastBuyTime: boughtRecently(shopListItem.lastBuyTime) ? shopListItem.lastBuyTime : now,
+                      history: boughtRecently(shopListItem.lastBuyTime) ? [] : [{
+                        buyingDateTime: now,
+                        ___class: 'buyingLog'
+                      }] 
                     });
   
   else
@@ -70,8 +74,12 @@ export function setItemBoughtNotNeeded(shopListItem) {
       {
         listRef: Security.user.listRef,
         needed: false,
-        lastBuyTime: now
-      }
+        lastBuyTime: now,
+        history: [{
+          buyingDateTime: now,
+          ___class: 'buyingLog'
+        }]
+      }, shopListItem
     ));
 }
 
@@ -81,11 +89,21 @@ export function setItemBoughtNotNeeded(shopListItem) {
  */
 export function cancelLastActions(shopListItem) {
   if(shopListItem.objectId)
-    return B.update('shopListItems', shopListItem.objectId, 
-                    { 
-                      needed: false,
-                      lastBuyTime: null // bullshit => this should be the next in history
-                    });
+    return B.fetchOne('shopListItems', shopListItem.objectId)
+      .then(item => {
+        let history = item.history.sort(function(a, b) {
+          return new Date(b.buyingDateTime) - new Date(a.buyingDateTime);
+        });
+        
+        history.shift();
+        //TODO should delete entity log and not only relation! (delete by date, no need to retrieve whole list)
+        return B.update('shopListItems', shopListItem.objectId, 
+                        Object.assign({ 
+                          needed: false,
+                          lastBuyTime: history.length > 0 ? history[0].buyingDateTime : null,
+                          history: history
+                        }, item));
+      });
                     
   // else if not created, nothing to do
 }

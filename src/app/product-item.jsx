@@ -60,10 +60,11 @@ export default class ProductItem extends React.Component {
   }
   
   cancelActions() {
+    
     this.setState({ itemState: Object.assign({ 
-      needed: false,
-      lastBuyTime: null   // todo => not correct :/ should take last buy time before...
+      needed: false
     }, this.state.itemState )});
+    
     cancelLastActions(this.state.itemState)
       .then(state => this.setState({ itemState: state }))
       .then(() => this.props.onItemStateChanged(null, null));
@@ -87,7 +88,13 @@ export default class ProductItem extends React.Component {
   }
 
   render() {
-    let lastBuyDate = this.state.itemState.lastBuyTime ? 'Dernier achat: ' + moment(this.state.itemState.lastBuyTime).format('Do MMM.') : 'Jamais acheté';
+    let lastBuyDate = 'Jamais acheté';
+    if (this.state.itemState.lastBuyTime) {
+      if(boughtRecently(this.state.itemState.lastBuyTime))
+        lastBuyDate = 'Acheté: ' + moment(this.state.itemState.lastBuyTime).fromNow();
+      else
+        lastBuyDate = 'Acheté: ' + moment(this.state.itemState.lastBuyTime).format('Do MMM.'); 
+    }
 
     let icon = vertIcon;
     if (this.state.itemState.needed)

@@ -83,6 +83,14 @@ class Backendless {
     .then(response => response.json());
   }
   
+  fetchOne(table, id) {
+    return fetch(`${this.root}/data/${table}/${id}`, 
+      {
+        headers: Object.assign({}, Config.backendless.headers, {"user-token": Security.user.userToken})
+      })
+      .then(res => res.json());
+  }
+  
   /*
     params: {
               table: 'products',
