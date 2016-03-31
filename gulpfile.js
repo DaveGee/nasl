@@ -24,7 +24,7 @@ gulp.task('libs', function() {
     b.require(lib);
   });
 
-  return libs = b.bundle()
+  return b.bundle()
     .on('error', prettyError)
     .pipe(source(config.libsDest))
     .pipe(buffer()) // mandatory for uglify..

@@ -21,7 +21,7 @@ export default class ProductItem extends React.Component {
     super(props);
     this.state = {
       product: props.product,
-      action: []
+      action: [props.product.state]
     };
   }
   
@@ -44,7 +44,19 @@ export default class ProductItem extends React.Component {
   
   switchState(event) {
     
-    setItemState(this.state.product.objectId, Enums.ItemState.Needed);
+    if (this.justBoughtSome())
+      setItemState(this.state.product.objectId, Enums.ItemState.None)
+        .then(item => this.setState({ action: [] }));
+    
+    else if(this.needed())
+      setItemState(this.state.product.objectId, Enums.ItemState.Bought)
+        .then(item => this.setState({ action: [Enums.ItemState.Bought]}));
+        
+    else
+      setItemState(this.state.product.objectId, Enums.ItemState.Needed)
+        .then(item => this.setState({ action: [Enums.ItemState.Needed]}));
+    
+    
     
     // if(this.justBoughtSome())
     //   this.setState({ action: [] });
