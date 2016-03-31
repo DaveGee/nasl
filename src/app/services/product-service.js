@@ -5,6 +5,10 @@ import {normalize} from '../helpers/strings';
 import Security from './security';
 import Enums from '../helpers/enums';
 
+/**
+ * get product paged on default paged size. Use for an "infinite scroll" load style
+ * 
+ */
 export function getMoreProducts(offset) {
   return B.fetch({
     table: 'products',
@@ -22,6 +26,10 @@ export function getMoreProducts(offset) {
     });
 };
 
+/**
+ * Recursively load all product so they're all available at once
+ * 
+ */
 export function getAllProducts() {
   return B.fetch({
     table: 'products',
@@ -31,6 +39,10 @@ export function getAllProducts() {
   }, true);
 }
 
+/**
+ * Get items for the current list of the user (item states etc...)
+ * 
+ */
 export function getShoppingList() {
   return B.fetch({
     table: 'shopListItems',
@@ -39,6 +51,10 @@ export function getShoppingList() {
   }, true);
 }
 
+/**
+ * save the state of a product as "Bought" => not needed anymore
+ * 
+ */
 export function setItemBoughtNotNeeded(shopListItem) {
   var now = new Date().toISOString();
   
@@ -59,6 +75,10 @@ export function setItemBoughtNotNeeded(shopListItem) {
     ));
 }
 
+/**
+ * reset the buy status of a product => not needed, cancel recent buy (go back in history)
+ * 
+ */
 export function cancelLastActions(shopListItem) {
   if(shopListItem.objectId)
     return B.update('shopListItems', shopListItem.objectId, 
@@ -70,6 +90,10 @@ export function cancelLastActions(shopListItem) {
   // else if not created, nothing to do
 }
 
+/**
+ * saves the state of a product as needed in the list
+ * 
+ */
 export function setItemNeeded(shopListItem) {
   
   // if object was just created by the front (no id)
@@ -87,11 +111,13 @@ export function setItemNeeded(shopListItem) {
       }, shopListItem));
 }
 
+/**
+ * add a new product in the list (the product will be available only to the current user, not 
+ * in the global list of product.)
+ * Typically called from "search+add" product in the title bar (popup)
+ * 
+ */
 export function addProduct(name) {
-
-  // find by name
-  // if not found, create product with owner = me
-  // add/update to my list (+needed)
 
   return B.fetch({
             table: 'products',
@@ -111,11 +137,14 @@ export function addProduct(name) {
       else
         return response.data[0]; // return first found
     })
-    // product created or retrieved...
-    .then(product => setItemState(product.objectId, Enums.ItemState.Needed));
+    // product created or retrieved...=> set as needed
+    .then(product => setItemNeeded({ productId: product.objectId }));
 }
 
-// check whether an item has been bought in the last x hours
+/**
+ * check whether an item has been bought in the last x hours
+ * 
+ */
 export function boughtRecently(lastBuyTime) {
   return lastBuyTime && moment(lastBuyTime) >= moment().subtract(24, 'hours'); 
 }
