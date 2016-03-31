@@ -44,10 +44,10 @@ export function setItemBoughtNotNeeded(shopListItem) {
   
   if(shopListItem.objectId) 
     return B.update('shopListItems', shopListItem.objectId, 
-    {
-      needed: false,
-      lastBuyTime: boughtRecently(shopListItem.lastBuyTime) ? shopListItem.lastBuyTime : now
-    });
+                    {
+                      needed: false,
+                      lastBuyTime: boughtRecently(shopListItem.lastBuyTime) ? shopListItem.lastBuyTime : now
+                    });
   
   else
     return B.create('shopListItems', Object.assign(
@@ -57,6 +57,17 @@ export function setItemBoughtNotNeeded(shopListItem) {
         lastBuyTime: now
       }
     ));
+}
+
+export function cancelLastActions(shopListItem) {
+  if(shopListItem.objectId)
+    return B.update('shopListItems', shopListItem.objectId, 
+                    { 
+                      needed: false,
+                      lastBuyTime: null // bullshit => this should be the next in history
+                    });
+                    
+  // else if not created, nothing to do
 }
 
 export function setItemNeeded(shopListItem) {

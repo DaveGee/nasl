@@ -13,11 +13,16 @@ export default class ProductList extends React.Component {
     this.state = {
     };
   }
+  
+  handleChange() {
+    this.props.onItemStateChanged();
+  }
 
   render() {
     var toItem = (product) => {
       return <ProductItem key={product.objectId}
-        product={product} shopStatus={product.shopStatus} />;
+        product={product} shopStatus={product.shopStatus} 
+        onItemStateChanged={this.handleChange.bind(this)} />;
     };
     
     function isInShopList(product) {

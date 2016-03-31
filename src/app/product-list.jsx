@@ -54,20 +54,31 @@ export default class ProductList extends React.Component {
     //   this.nextDataOffset = products.nextDataOffset;
     // });
     
-    getAllProducts()
+    this.loadData();
+  }
+  
+  loadData() {
+    return getAllProducts()
       .then(products => {
         return getShoppingList().then(list => this.matchProducts(products, list));
       })
       .then(data => this.setState({ products: data }));
   }
-  componentWillUnmount() {
-
+  
+  reloadData() {
+    if (this._reloading)
+      clearTimeout(this._reloading);
+      
+    this._reloading = setTimeout(() => {
+      this._reloading = null;
+      this.loadData();
+    }, 1800);
   }
 
   render() {
     return <div>
       <Header products={this.state.products.map(p => p.name)} />
-      <ProductListView products={this.state.products} />
+      <ProductListView products={this.state.products} onItemStateChanged={this.reloadData.bind(this)} />
     </div >;
   }
 }

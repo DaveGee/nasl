@@ -2,7 +2,7 @@ const Enums = {
   ItemState: {
     Needed: 'needed',
     Bought: 'bought',
-    None: null
+    None: 'none'
   }
 };
 
