@@ -31,40 +31,49 @@ export function getAllProducts() {
   }, true);
 }
 
-export function setItemState(productId, state) {
-  // get shop list item by product id in my list
-    // if doesn't exist, create
-    // if exists, change state 
-  
-  let now = new Date().toISOString();
-      
-  // exists in my shoplist ?
+export function getShoppingList() {
   return B.fetch({
     table: 'shopListItems',
-    props: ['needed', 'lastBuyTime', 'objectId', 'productId', 'listRef'],
-    filters: [
-      { colName: 'productId', value: productId },
-      { colName: 'listRef', value: Security.user.listRef }
-    ]
-  }, false)
+    props: ['objectId', 'productId', 'needed', 'listRef', 'lastBuyTime'],
+    where: `listRef='${Security.user.listRef}'`
+  }, true);
+}
+
+export function setItemBoughtNotNeeded(shopListItem) {
+  var now = new Date().toISOString();
   
-  // item found in shoplist ? (404 if shoplist does not exist)
-  .then(response => {
-    
-    if(!response.totalObjects || response.totalObjects === 0)
-      return B.create('shopListItems', {
-        productId: productId,
-        needed: state === Enums.ItemState.Needed, 
-        lastBuyTime: state === Enums.ItemState.Bought ? now : null,
-        listRef: Security.user.listRef
-      });
-    else
-      return B.update('shopListItems', response.data[0].objectId, 
+  if(shopListItem.objectId) 
+    return B.update('shopListItems', shopListItem.objectId, 
+    {
+      needed: false,
+      lastBuyTime: boughtRecently(shopListItem.lastBuyTime) ? shopListItem.lastBuyTime : now
+    });
+  
+  else
+    return B.create('shopListItems', Object.assign(
+      {
+        listRef: Security.user.listRef,
+        needed: false,
+        lastBuyTime: now
+      }
+    ));
+}
+
+export function setItemNeeded(shopListItem) {
+  
+  // if object was just created by the front (no id)
+  if (shopListItem.objectId) 
+    return B.update('shopListItems', shopListItem.objectId, 
         { 
-          needed: state === Enums.ItemState.Needed, 
-          lastBuyTime: state === Enums.ItemState.Bought ? now : null
+          needed: true
         });
-  });
+        
+  else
+    return B.create('shopListItems', Object.assign(
+      { 
+        listRef: Security.user.listRef,
+        needed: true 
+      }, shopListItem));
 }
 
 export function addProduct(name) {
@@ -93,4 +102,9 @@ export function addProduct(name) {
     })
     // product created or retrieved...
     .then(product => setItemState(product.objectId, Enums.ItemState.Needed));
+}
+
+// check whether an item has been bought in the last x hours
+export function boughtRecently(lastBuyTime) {
+  return lastBuyTime && moment(lastBuyTime) >= moment().subtract(24, 'hours'); 
 }

@@ -4,7 +4,7 @@ import Divider from 'material-ui/lib/divider';
 import Subheader from 'material-ui/lib/Subheader';
 import ProductItem from './product-item';
 import IconButton from 'material-ui/lib/icon-button';
-import { getAllProducts } from './services/product-service';
+import { getAllProducts, boughtRecently } from './services/product-service';
 
 export default class ProductList extends React.Component {
   constructor(props) {
@@ -17,18 +17,22 @@ export default class ProductList extends React.Component {
   render() {
     var toItem = (product) => {
       return <ProductItem key={product.objectId}
-        product={product} />;
+        product={product} shopStatus={product.shopStatus} />;
     };
+    
+    function isInShopList(product) {
+      return product.shopStatus && (product.shopStatus.needed || boughtRecently(product.shopStatus.lastBuyTime));
+    }
 
     return <div>
       <List>
         <Subheader inset={true}>Ma liste habituelle</Subheader>
-        {this.props.products.filter(p => !!p.lastBuyTime).map(toItem) }
+        {this.props.products.filter(p => isInShopList(p)).map(toItem) }
       </List>
       <Divider inset={true} />
       <List>
         <Subheader inset={true}>Tous les autres produits</Subheader>
-        {this.props.products.filter(p => !!!p.lastBuyTime).map(toItem) }
+        {this.props.products.filter(p => !isInShopList(p)).map(toItem) }
       </List>
     </div >;
   }

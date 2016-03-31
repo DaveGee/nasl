@@ -1,7 +1,7 @@
 import React from 'react';
 import Header from './header';
 import ProductListView from './product-list-view';
-import { getAllProducts } from './services/product-service';
+import { getAllProducts, getShoppingList } from './services/product-service';
 
 
 // actions : 
@@ -31,6 +31,18 @@ export default class ProductList extends React.Component {
       products: []
     };
   }
+  
+  matchProducts(products, shoppingList) {
+    if(!products) return [];
+    shoppingList = shoppingList || [];
+    
+    shoppingList.forEach(s => {
+      let product = products.find(p => p.objectId === s.productId);
+      if (product) product.shopStatus = s;  
+    });
+    
+    return products;
+  }
 
   componentWillMount() {
     
@@ -42,7 +54,11 @@ export default class ProductList extends React.Component {
     //   this.nextDataOffset = products.nextDataOffset;
     // });
     
-    getAllProducts().then(data => this.setState({ products: data }));
+    getAllProducts()
+      .then(products => {
+        return getShoppingList().then(list => this.matchProducts(products, list));
+      })
+      .then(data => this.setState({ products: data }));
   }
   componentWillUnmount() {
 
