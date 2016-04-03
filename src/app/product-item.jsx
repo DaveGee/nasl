@@ -6,20 +6,21 @@ import IconMenu from 'material-ui/lib/menus/icon-menu';
 import MenuItem from 'material-ui/lib/menus/menu-item';
 import Unknown from 'material-ui/lib/svg-icons/action/help';
 import Avatar from 'material-ui/lib/avatar';
-import {grey400, red600, teal600} from 'material-ui/lib/styles/colors';
+import * as color from 'material-ui/lib/styles/colors';
 import moment from 'moment';
 import Enums from './helpers/enums';
 import ProductService from './services/product-service';
 import Divider from 'material-ui/lib/divider';
 
-const boughtIcon = <FontIcon className="material-icons" color={teal600}>check_circle</FontIcon>;
-const neededIcon = <FontIcon className="material-icons" color={red600}>report_problem</FontIcon>;
-const vertIcon = <FontIcon className="material-icons" color={grey400}>more_vert</FontIcon>;
+const boughtIcon = <FontIcon className="material-icons" color={color.teal600}>check_circle</FontIcon>;
+const neededIcon = <FontIcon className="material-icons" color={color.amber300}>report_problem</FontIcon>;
+const vertIcon = <FontIcon className="material-icons" color={color.grey400}>more_vert</FontIcon>;
 
 export default class ProductItem extends React.Component {
 
   constructor(props) {
     super(props);
+    
     // set right icon menu initial state
     let initialMenuState = null;
     if (props.item.needed)
@@ -36,7 +37,6 @@ export default class ProductItem extends React.Component {
   }
   
   switchState() {
-    
     // nothing --> needed --> bought(-needed) --> needed(+bought) --> bought ...
     
     if(!this.state.needed)
@@ -47,16 +47,14 @@ export default class ProductItem extends React.Component {
   }
   
   setBought() {
-    if(!ProductService.boughtRecently(this.state.lastBuyTime)) {
-      let now = new Date().toISOString();
-      
-      this.setState({ lastBuyTime: now });
+    let now = ProductService.boughtRecently(this.state.lastBuyTime) ?
+      this.state.lastBuyTime :
+      new Date().toISOString();
     
-      return ProductService.setItemBoughtNotNeeded(this.props.item, now)
-        .then(() => this.props.onItemStateChanged());
-    }
-    
-    return Promise.reject();
+    this.setState({ lastBuyTime: now, needed: false });
+  
+    return ProductService.setItemBoughtNotNeeded(this.props.item, now)
+      .then(() => this.props.onItemStateChanged());
   }
   
   setNeeded() {
@@ -96,6 +94,7 @@ export default class ProductItem extends React.Component {
   }
 
   render() {
+    // sublabel for last buy time
     let lastBuyDate = 'Jamais acheté';
     if (this.state.lastBuyTime) {
       if(ProductService.boughtRecently(this.state.lastBuyTime))
@@ -104,27 +103,33 @@ export default class ProductItem extends React.Component {
         lastBuyDate = 'Acheté: ' + moment(this.state.lastBuyTime).format('Do MMM.'); 
     }
 
+    // icon on the right (that opens the menu)
     let icon = vertIcon;
     if (this.state.needed)
       icon = neededIcon;
     else if (ProductService.boughtRecently(this.state.lastBuyTime))
       icon = boughtIcon;
-
+    
     let iconButtonElement = (
       <IconButton touch={true}>
         {icon}
       </IconButton>
     );
-
+    
+    // cancel action
+    let cancelAction = this.state.needed || ProductService.boughtRecently(this.state.lastBuyTime);
+    
+    // menu on the right
     let rightIconMenu = (
       <IconMenu iconButtonElement={iconButtonElement}
           onChange={this.menuChanged.bind(this)}
           value={this.state.menuValue}
           multiple={false}>
-        <MenuItem value={Enums.ItemState.Bought} primaryText="J'en ai acheté" leftIcon={boughtIcon} />
         <MenuItem value={Enums.ItemState.Needed} primaryText="Il en faut absolument" leftIcon={neededIcon} />
+        <MenuItem value={Enums.ItemState.Bought} primaryText="J'en ai acheté" leftIcon={boughtIcon} />
         <Divider />
-        <MenuItem value={Enums.ItemState.None} primaryText="Annuler les dernières actions" />
+        {cancelAction ? <MenuItem value={Enums.ItemState.None} primaryText="Annuler les dernières actions" /> : null}
+        <MenuItem primaryText="Fermer" />
       </IconMenu>
     );
 
@@ -133,6 +138,7 @@ export default class ProductItem extends React.Component {
                      rightIconButton={rightIconMenu}
                      primaryText={this.props.item.product.name}
                      secondaryText={lastBuyDate}
-                     onTouchTap={this.switchState.bind(this)} />;
+                     onTouchTap={this.switchState.bind(this)}
+                     innerDivStyle={{ color: this.state.needed ? color.grey900 : color.grey600 }}/>;
   }
 }

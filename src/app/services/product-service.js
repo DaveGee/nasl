@@ -76,23 +76,29 @@ class ProductService {
   cancelLastActions(shopListItem) {
     if (shopListItem.objectId) {
       
-      let previous = null;
-      if(shopListItem.history) {
-        shopListItem.history.sort(function(a, b) {
-          return new Date(a.buyTime) - new Date(b.buyTime);
-        });
-        
-        shopListItem.history.shift();
-        
-        if(shopListItem.history.length > 0)
-          previous = shopListItem.history[0];
+      if(this.boughtRecently(shopListItem)) {
+        // if there's no history, or only the recent buy in history, delete buy times
+        if(!shopListItem.history || shopListItem.history.length < 2) {
+          shopListItem.lastBuyTime = null;
+          shopListItem.history = [];
+        } 
+        else {
+          // there's a _rather long_ history
+          shopListItem.history.sort(function(a, b) {
+            return new Date(b.buyTime) - new Date(a.buyTime);
+          });
+          
+          // delete the last one
+          shopListItem.history.shift();
+          shopListItem.lastBuyTime = shopListItem.history[0].buyTime;
+        }
       }
       
+      // reset needed flag
       shopListItem.needed = false;
-      shopListItem.lastBuyTime = previous;
       
       return B.update('listItems', shopListItem.objectId, shopListItem)
-        .then(() => previous);
+        .then(() => shopListItem.lastBuyTime);
     }
   }
   
@@ -103,14 +109,15 @@ class ProductService {
   setItemBoughtNotNeeded(shopListItem, timeStr) {
     let now = timeStr || new Date().toISOString();
     
+    // if timeStr is the same, it means we are buying something we bought recently => don't update history
+    let updateHistory = shopListItem.lastBuyTime !== now ?
+       [{ buyTime: now, ___class: 'buyingLog' }] : [];
+    
     let diff = {
           needed: false,
           lastBuyTime: now,
           ___class: 'listItems',
-          history: [{
-            buyTime: now,
-            ___class: 'buyingLog'
-          }]
+          history: updateHistory
         };
     
     if (shopListItem.objectId)
