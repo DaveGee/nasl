@@ -27,7 +27,11 @@ class Backendless {
   getUserToken() {
     return localStorage.getItem('nasl-user-token');
   }
-
+  
+  /**
+   * Check session or login if necessary.
+   * returns a NASL-user
+   */
   login(credentials) {
     
     return this.checkSession()
@@ -61,6 +65,9 @@ class Backendless {
       }, user));
   }
   
+  /**
+   * Check if session is ok. Returns true if ok, reject promise if not
+   */
   checkSession() {
     if(this.getUserToken()) 
       return fetch(this.root + '/users/isvalidusertoken/' + this.getUserToken(), {
@@ -76,6 +83,10 @@ class Backendless {
       return Promise.reject('No security token');
   }
   
+  /**
+   * Update a record of type 'tableName', with id 'itemId'
+   * returns the response (object itself)
+   */
   update(tableName, itemId, itemProps) {
     return fetch(`${this.root}/data/${tableName}/${itemId}`, {
       method: 'put',
@@ -85,6 +96,10 @@ class Backendless {
     .then(response => response.json());
   }
   
+  /**
+   * Create a record of type 'tableName'
+   * returns the record created
+   */
   create(tableName, item) {
     return fetch(`${this.root}/data/${tableName}`, {
       method: 'post',
@@ -94,6 +109,9 @@ class Backendless {
     .then(response => response.json());
   }
   
+  /**
+   * gets 1 record for specific id
+   */
   fetchOne(table, id) {
     return fetch(`${this.root}/data/${table}/${id}`, 
       {
@@ -102,14 +120,11 @@ class Backendless {
       .then(res => res.json());
   }
   
-  /*
-    params: {
-              table: 'products',
-              props: ['objectId', 'image', 'name'],
-              order: ['name'],
-              filter: { colName: 'name', value: 'xx'}
-            }
-  */
+  /**
+   * gets a list of record, following criterias
+   * params = {table: ..., props: [...], startAt: ..., order: ..., where: ..., filters: ...}
+   * returns an array of elements (load all if paginated)
+   */
   fetch(params, all = true) {
     let reqParams = {
       headers: Object.assign({}, Config.backendless.headers, {"user-token": this.getUserToken()})

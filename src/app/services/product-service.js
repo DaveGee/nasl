@@ -1,13 +1,15 @@
 import moment from 'moment';
 import B from '../data/backendless';
-//import F from '../data/firebase';
+import F from '../data/firebase';
 import Config from '../../config';
 import {normalize} from '../helpers/strings';
 import Identity from './identity';
 import Enums from '../helpers/enums';
 
+var DB = Config.database === 'firebase' ? F : B;
+
 class ProductService {
-  constructor(database) { 
+  constructor() { 
     
   }
   
@@ -20,7 +22,7 @@ class ProductService {
    * 
    */
   getMoreProducts(offset) {
-    return B.fetch({
+    return DB.fetch({
       table: 'products',
       props: ['objectId', 'image', 'name'],
       order: ['name'],
@@ -40,7 +42,7 @@ class ProductService {
    * 
    */
   getAllProducts() {
-    return B.fetch({
+    return DB.fetch({
       table: 'products',
       props: ['objectId', 'image', 'name'],
       order: ['name']
@@ -53,13 +55,13 @@ class ProductService {
    */
   loadShoppingList() {
     if(Identity.user.list && Identity.user.userId)
-      return B.fetchOne('users', Identity.user.userId)
+      return DB.fetchOne('users', Identity.user.userId)
         .then(user => {
           Identity.user.lost = user.list;
           return user.list;
         });
     else
-      return B.update('users', Identity.user.userId, {
+      return DB.update('users', Identity.user.userId, {
         list: {
           humanRef: Identity.user.name + '\'s list',
           items: [],
@@ -100,7 +102,7 @@ class ProductService {
       // reset needed flag
       shopListItem.needed = false;
       
-      return B.update('listItems', shopListItem.objectId, shopListItem)
+      return DB.update('listItems', shopListItem.objectId, shopListItem)
         .then(() => shopListItem.lastBuyTime);
     }
   }
@@ -124,9 +126,9 @@ class ProductService {
         };
     
     if (shopListItem.objectId)
-      return B.update('listItems', shopListItem.objectId, diff);
+      return DB.update('listItems', shopListItem.objectId, diff);
     else
-      return B.update('lists', Identity.user.list.objectId,
+      return DB.update('lists', Identity.user.list.objectId,
         {
           items: [
             Object.assign(diff, shopListItem)
@@ -145,9 +147,9 @@ class ProductService {
                };
     // if item does not exist in list yet
     if (shopListItem.objectId)
-      return B.update('listItems', shopListItem.objectId, diff);
+      return DB.update('listItems', shopListItem.objectId, diff);
     else
-      return B.update('lists', Identity.user.list.objectId,
+      return DB.update('lists', Identity.user.list.objectId,
         {
           items: [
             Object.assign(diff, shopListItem)
@@ -163,7 +165,7 @@ class ProductService {
    */
   addProduct(name) {
 
-    return B.fetch({
+    return DB.fetch({
       table: 'products',
       props: ['objectId', 'name', 'normalizedName'],
       filters: [{ colName: 'normalizedName', value: normalize(name) }]
@@ -172,7 +174,7 @@ class ProductService {
       .then(response => {
 
         if (response.totalObjects === 0)
-          return B.create('products', {
+          return DB.create('products', {
             name: name,
             normalizedName: normalize(name),
             image: null
