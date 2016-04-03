@@ -173,9 +173,11 @@ class ProductService {
       // product created or retrieved...=> set as needed
       .then(product => {
         let item = { product: product }; // create a new one if none found
+        // find item related to product in the cache
         if(Identity.user.list)
           item = Identity.user.list.items.find(i => i.product.objectId === product.objectId) || { product: product };
-          
+        
+        // save new item in backend
         return this.setItemNeeded(item)
           .then(() => product);
       });

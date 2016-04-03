@@ -36,53 +36,59 @@ export default class ProductList extends React.Component {
   }
   
   componentWillMount() {  
-    this.loadData(true, false); // list is already in Identity
+    this.loadList(true);  // login did cache initial list
+    this.loadProducts();
   }
   
-  mergeItems(products, list) {
-    list = list || { items: [] };
-    return products.map(p => list.items.find(i => i.product.objectId === p.objectId) || { product: p }).sort(productSorter);
+  mergeItems(products, items) {
+    if(!products || products.length === 0) return items;
+    items = items || [];
+    return products.map(p => items.find(i => i.product.objectId === p.objectId) || { product: p }).sort(productSorter);
   }
   
-  loadData(reloadProduct = false, reloadList = false) {
-    
-    let productLoader = reloadProduct ?
-      ProductService.getAllProducts :
-      function() { return Promise.resolve(this._products); }.bind(this);
-    
-    let listLoader = reloadList ?
-      ProductService.loadShoppingList :
-      function() { return Promise.resolve(Identity.user.list); }.bind(this);
-    
-    return productLoader()
+  loadProducts() {
+    return ProductService.getAllProducts()
       .then(products => {
-        this._products = products;
+        this._products = products; //cache list of products, this should not be reloaded during use
         
-        return listLoader()
-          .then(list => this.mergeItems(products, list))
-          .catch(() => this.mergeItems(products));
+        return this.loadList(true);
+      });
+  }
+  
+  loadList(cache = false) {
+    let listLoader = cache ?
+    function() { return Promise.resolve(Identity.user.list); }.bind(this) :
+    ProductService.loadShoppingList;
+    
+    return listLoader()
+      .then(list => {
+        return Promise.resolve(this._products || [])
+          .then(products => this.mergeItems(products, list.items));
       })
       .then(data => this.setState({ items: data }));
   }
   
-  reloadItems(reloadProduct = false, reloadList = false) {
+  reloadItemsDelayed() {
     if (this._reloading)
       clearTimeout(this._reloading);
       
     this._reloading = setTimeout(() => {
       this._reloading = null;
-      this.loadData(reloadProduct, reloadList);
+      this.loadList();
     }, 1500);
   }
   
   handleNewProduct(product) {
-    reloadItems();
+    // add product to cache
+    console.log(product);
+    this._products.push(product);
+    reloadItemsDelayed();
   }
 
   render() {
     return <div>
-      <Header products={this.state.items.map(i => i.product.name)} onProductSelected={this.reloadItems.bind(this, true, true)} />
-      <ProductListView items={this.state.items} onItemStateChanged={this.reloadItems.bind(this, false, true)} />
+      <Header products={this.state.items.map(i => i.product.name)} onProductSelected={this.handleNewProduct.bind(this)} />
+      <ProductListView items={this.state.items} onItemStateChanged={this.reloadItemsDelayed.bind(this)} />
     </div >;
   }
 }
