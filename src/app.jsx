@@ -3,7 +3,7 @@ import ReactDom from 'react-dom';
 import Header from './app/header';
 import ProductList from './app/product-list';
 import injectTapEventPlugin from 'react-tap-event-plugin';
-import Security from './app/services/security';
+import Identity from './app/services/identity';
 import Dialog from 'material-ui/lib/dialog';
 
 // Needed for onTouchTap
@@ -12,7 +12,7 @@ import Dialog from 'material-ui/lib/dialog';
 // https://github.com/zilverline/react-tap-event-plugin
 injectTapEventPlugin();
 
-Security.auth()
+Identity.auth()
   .then(() => {
     ReactDom.render(
       <ProductList />,

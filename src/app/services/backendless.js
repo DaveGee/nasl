@@ -1,5 +1,5 @@
 import Config from '../../config';
-import Security from './security';
+import Identity from './identity';
 import {encode} from '../helpers/strings';
 
 var handleErrors = function(response) {
@@ -31,11 +31,11 @@ class Backendless {
       .then(response => response.json())
       .then(userData => {
         return {
-          userId: userData["objectId"],
+          objectId: userData["objectId"],
           userToken: userData['user-token'],
           name: userData['name'],
           email: userData['email'],
-          listRef: userData['listRef']
+          list: userData['list']
         }
       });
   }
@@ -53,11 +53,11 @@ class Backendless {
         .then(response => response.json())
         .then(response => {
           return {
-            userId: response.data[0].objectId,
+            objectId: response.data[0].objectId,
             userToken: userToken,
             name: response.data[0].name,
             email: response.data[0].email,
-            listRef: response.data[0].listRef
+            list: response.data[0].list
           };
         });
        else 
@@ -68,7 +68,7 @@ class Backendless {
   update(tableName, itemId, itemProps) {
     return fetch(`${this.root}/data/${tableName}/${itemId}`, {
       method: 'put',
-      headers: Object.assign({}, Config.backendless.headers, {'user-token': Security.user.userToken}),
+      headers: Object.assign({}, Config.backendless.headers, {'user-token': Identity.user.userToken}),
       body: JSON.stringify(itemProps)
     })
     .then(response => response.json());
@@ -77,7 +77,7 @@ class Backendless {
   create(tableName, item) {
     return fetch(`${this.root}/data/${tableName}`, {
       method: 'post',
-      headers: Object.assign({}, Config.backendless.headers, {"user-token": Security.user.userToken}),
+      headers: Object.assign({}, Config.backendless.headers, {"user-token": Identity.user.userToken}),
       body: JSON.stringify(item)
     })
     .then(response => response.json());
@@ -86,7 +86,7 @@ class Backendless {
   fetchOne(table, id) {
     return fetch(`${this.root}/data/${table}/${id}`, 
       {
-        headers: Object.assign({}, Config.backendless.headers, {"user-token": Security.user.userToken})
+        headers: Object.assign({}, Config.backendless.headers, {"user-token": Identity.user.userToken})
       })
       .then(res => res.json());
   }
@@ -101,7 +101,7 @@ class Backendless {
   */
   fetch(params, all = true) {
     let reqParams = {
-      headers: Object.assign({}, Config.backendless.headers, {"user-token": Security.user.userToken})
+      headers: Object.assign({}, Config.backendless.headers, {"user-token": Identity.user.userToken})
     };
     let props = params.props ? '&props=' + params.props.join(',') : '';
     let sort = params.order ? '&sortBy=' + params.order.join(',') : '';

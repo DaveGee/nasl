@@ -9,7 +9,7 @@ import Avatar from 'material-ui/lib/avatar';
 import {grey400, red600, teal600} from 'material-ui/lib/styles/colors';
 import moment from 'moment';
 import Enums from './helpers/enums';
-import {setItemNeeded, setItemBoughtNotNeeded, boughtRecently, cancelLastActions} from './services/product-service';
+import ProductService from './services/product-service';
 import Divider from 'material-ui/lib/divider';
 
 const boughtIcon = <FontIcon className="material-icons" color={teal600}>check_circle</FontIcon>;
@@ -22,14 +22,15 @@ export default class ProductItem extends React.Component {
     super(props);
     // set right icon menu initial state
     let initialMenuState = null;
-    if (props.shopStatus && props.shopStatus.needed)
+    if (props.item.needed)
       initialMenuState = Enums.ItemState.Needed;
-    else if (props.shopStatus && boughtRecently(props.shopStatus.lastBuyTime))
+    else if (ProductService.boughtRecently(props.item))
       initialMenuState = Enums.ItemState.Bought;
     
-    this.state = {
-      product: props.product,
-      itemState: props.shopStatus || { productId: props.product.objectId },
+    this.state = {      
+      needed: props.item.needed,
+      lastBuyTime: props.item.lastBuyTime,
+      
       menuValue: initialMenuState
     };
   }
@@ -38,7 +39,7 @@ export default class ProductItem extends React.Component {
     
     // nothing --> needed --> bought(-needed) --> needed(+bought) --> bought ...
     
-    if(!this.state.itemState.needed)
+    if(!this.state.needed)
       this.setNeeded();
     else {
       this.setBought();
@@ -46,60 +47,67 @@ export default class ProductItem extends React.Component {
   }
   
   setBought() {
-    this.setState({ itemState: { lastBuyTime: new Date().toISOString() }});
-    setItemBoughtNotNeeded(this.state.itemState)
-      .then(state => this.setState({ itemState: state }))
-      .then(() => this.props.onItemStateChanged(Enums.ItemState.Bought, this.state.itemState.lastBuyTime));
+    if(!ProductService.boughtRecently(this.state.lastBuyTime)) {
+      let now = new Date().toISOString();
+      
+      this.setState({ lastBuyTime: now });
+    
+      return ProductService.setItemBoughtNotNeeded(this.props.item, now)
+        .then(() => this.props.onItemStateChanged());
+    }
+    
+    return Promise.reject();
   }
   
   setNeeded() {
-    this.setState({ itemState: Object.assign({ needed: true }, this.state.itemState)});
-    setItemNeeded(this.state.itemState)
-      .then(state => this.setState({ itemState: state }))
-      .then(() => this.props.onItemStateChanged(Enums.ItemState.Needed, true));
+    this.setState({ needed: true });
+    
+    return ProductService.setItemNeeded(this.props.item)
+      .then(() => this.props.onItemStateChanged());
   }
   
   cancelActions() {
     
-    this.setState({ itemState: Object.assign({ 
-      needed: false
-    }, this.state.itemState )});
+    this.setState({
+      needed: false,
+      lastBuyTime: null   // ahem...
+    });
     
-    cancelLastActions(this.state.itemState)
-      .then(state => this.setState({ itemState: state }))
-      .then(() => this.props.onItemStateChanged(null, null));
+    return ProductService.cancelLastActions(this.props.item)
+      .then(previousBuyTime => this.setState({ lastBuyTime: previousBuyTime }))
+      .then(() => this.props.onItemStateChanged());
   }
   
   menuChanged(event, value) {
     
     if(value === Enums.ItemState.None) {
-      this.cancelActions();
-      this.setState({ menuValue: null });
+      this.cancelActions()
+        .then(x => this.setState({ menuValue: null }));
       return;
     }
     
     if(value === Enums.ItemState.Needed)
-      this.setNeeded();
+      this.setNeeded()
+        .then(x => this.setState({ menuValue: value }));
       
     if(value === Enums.ItemState.Bought)
-      this.setBought();
-    
-    this.setState({ menuValue: value });
+      this.setBought()
+        .then(x => this.setState({ menuValue: value }));
   }
 
   render() {
     let lastBuyDate = 'Jamais acheté';
-    if (this.state.itemState.lastBuyTime) {
-      if(boughtRecently(this.state.itemState.lastBuyTime))
-        lastBuyDate = 'Acheté: ' + moment(this.state.itemState.lastBuyTime).fromNow();
+    if (this.state.lastBuyTime) {
+      if(ProductService.boughtRecently(this.state.lastBuyTime))
+        lastBuyDate = 'Acheté: ' + moment(this.state.lastBuyTime).fromNow();
       else
-        lastBuyDate = 'Acheté: ' + moment(this.state.itemState.lastBuyTime).format('Do MMM.'); 
+        lastBuyDate = 'Acheté: ' + moment(this.state.lastBuyTime).format('Do MMM.'); 
     }
 
     let icon = vertIcon;
-    if (this.state.itemState.needed)
+    if (this.state.needed)
       icon = neededIcon;
-    else if (boughtRecently(this.state.itemState.lastBuyTime))
+    else if (ProductService.boughtRecently(this.state.lastBuyTime))
       icon = boughtIcon;
 
     let iconButtonElement = (
@@ -120,10 +128,10 @@ export default class ProductItem extends React.Component {
       </IconMenu>
     );
 
-    return <ListItem key={this.state.product.id}
-                     leftAvatar={<Avatar src={this.state.product.image} />}
+    return <ListItem key={this.props.item.product.id}
+                     leftAvatar={<Avatar src={this.props.item.product.image} />}
                      rightIconButton={rightIconMenu}
-                     primaryText={this.state.product.name}
+                     primaryText={this.props.item.product.name}
                      secondaryText={lastBuyDate}
                      onTouchTap={this.switchState.bind(this)} />;
   }

@@ -4,7 +4,7 @@ import IconButton from 'material-ui/lib/icon-button';
 import Dialog from 'material-ui/lib/dialog';
 import FlatButton from 'material-ui/lib/flat-button';
 import AutoComplete from 'material-ui/lib/auto-complete';
-import { addProduct } from './services/product-service';
+import ProductService from './services/product-service';
 
 export default class Header extends React.Component {
   constructor(props) {
@@ -16,7 +16,8 @@ export default class Header extends React.Component {
   }
 
   addItem(selected) {
-    addProduct(selected);
+    ProductService.addProduct(selected)
+      .then(p => this.props.onProductSelected(p));
     this.closeDialog();
   }
 

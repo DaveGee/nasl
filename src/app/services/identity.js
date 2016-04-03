@@ -1,14 +1,17 @@
 import B from './backendless';
 import Config from '../../config';
-import Cookies from '../helpers/cookies';
 
-class Security {
+class Identity {
   constructor() {
     
   }
   
   get user() {
     return this._user;
+  }
+  
+  setList(list) {
+    this._user.list = list;
   }
   
   auth() {
@@ -25,7 +28,7 @@ class Security {
         // }
         this._user = userData;
         
-        Cookies.setItem("nasl-user-token", userData.userToken, Infinity, '/');
+        localStorage.setItem('nasl-user-token', userData.userToken);
         
         return userData;
     };
@@ -35,9 +38,10 @@ class Security {
         .then(saveUserData.bind(this));
     };
     
-    // test cookie 
-    if(Cookies.hasItem('nasl-user-token'))
-      return B.checkSession(Cookies.getItem('nasl-user-token'), Config.TMPUser.login)
+    // test cookie
+    let user = localStorage.getItem('nasl-user'); 
+    if(user)
+      return B.checkSession(user, Config.TMPUser.login)
                 .then(saveUserData.bind(this))
                 .catch(login.bind(this));
     else
@@ -45,4 +49,4 @@ class Security {
   }
 }
 
-export default new Security();
+export default new Identity();
