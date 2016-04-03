@@ -1,5 +1,5 @@
 import Config from '../../config';
-import Identity from './identity';
+import Identity from '../services/identity';
 import {encode} from '../helpers/strings';
 
 var handleErrors = function(response) {
@@ -19,56 +19,67 @@ class Backendless {
   get root() {
     return `${Config.backendless.url}/${Config.backendless.version}`;
   }
-
-  login(credentials) {
-    return fetch(`${this.root}/users/login`,
-      {
-        method: 'post',
-        headers: Config.backendless.headers,
-        body: JSON.stringify(credentials)
-      })
-      .then(response => handleErrors(response))
-      .then(response => response.json())
-      .then(userData => {
-        return {
-          objectId: userData["objectId"],
-          userToken: userData['user-token'],
-          name: userData['name'],
-          email: userData['email'],
-          list: userData['list']
-        }
-      });
+  
+  saveUserToken(userToken) {
+    localStorage.setItem('nasl-user-token', userToken);
   }
   
-  checkSession(userToken, username) {
-    return fetch(this.root + '/users/isvalidusertoken/' + userToken, {
-      headers: Config.backendless.headers
-    })
-    .then(response => response.json())
-    .then(response => {
-      if(response)
-        return fetch(this.root + '/data/users?where=' + encode(`email='${username}'`), {
-          headers: Config.backendless.headers
+  getUserToken() {
+    return localStorage.getItem('nasl-user-token');
+  }
+
+  login(credentials) {
+    
+    return this.checkSession()
+      // session is ok, download user profile + list
+      .then(() => {
+        return this.fetch({
+          table: 'users',
+          where: `email='${credentials.login}'`
         })
+        .then(data => data[0]);
+      })
+      // session is not ok, login and download data
+      .catch(err => {
+        console.log(err);
+        return fetch(`${this.root}/users/login`,
+        {
+          method: 'post',
+          headers: Config.backendless.headers,
+          body: JSON.stringify(credentials)
+        })
+        .then(response => handleErrors(response))
         .then(response => response.json())
-        .then(response => {
-          return {
-            objectId: response.data[0].objectId,
-            userToken: userToken,
-            name: response.data[0].name,
-            email: response.data[0].email,
-            list: response.data[0].list
-          };
+        .then(data => {
+          // save token
+          this.saveUserToken(data['user-token']);
+          return data;  // return user
         });
-       else 
-        throw "Invalid security token";
-    })
+      })
+      .then(user => Object.assign({
+        userId: user.objectId
+      }, user));
+  }
+  
+  checkSession() {
+    if(this.getUserToken()) 
+      return fetch(this.root + '/users/isvalidusertoken/' + this.getUserToken(), {
+        headers: Config.backendless.headers
+      })
+      .then(response => response.json())
+      .then(response => {
+        if(!response) 
+          throw "Invalid security token";
+        return true;
+      });
+    else
+      return Promise.reject('No security token');
   }
   
   update(tableName, itemId, itemProps) {
     return fetch(`${this.root}/data/${tableName}/${itemId}`, {
       method: 'put',
-      headers: Object.assign({}, Config.backendless.headers, {'user-token': Identity.user.userToken}),
+      headers: Object.assign({}, Config.backendless.headers, {'user-token': this.getUserToken()}),
       body: JSON.stringify(itemProps)
     })
     .then(response => response.json());
@@ -77,7 +88,7 @@ class Backendless {
   create(tableName, item) {
     return fetch(`${this.root}/data/${tableName}`, {
       method: 'post',
-      headers: Object.assign({}, Config.backendless.headers, {"user-token": Identity.user.userToken}),
+      headers: Object.assign({}, Config.backendless.headers, {"user-token": this.getUserToken()}),
       body: JSON.stringify(item)
     })
     .then(response => response.json());
@@ -86,7 +97,7 @@ class Backendless {
   fetchOne(table, id) {
     return fetch(`${this.root}/data/${table}/${id}`, 
       {
-        headers: Object.assign({}, Config.backendless.headers, {"user-token": Identity.user.userToken})
+        headers: Object.assign({}, Config.backendless.headers, {"user-token": this.getUserToken()})
       })
       .then(res => res.json());
   }
@@ -101,14 +112,14 @@ class Backendless {
   */
   fetch(params, all = true) {
     let reqParams = {
-      headers: Object.assign({}, Config.backendless.headers, {"user-token": Identity.user.userToken})
+      headers: Object.assign({}, Config.backendless.headers, {"user-token": this.getUserToken()})
     };
     let props = params.props ? '&props=' + params.props.join(',') : '';
     let sort = params.order ? '&sortBy=' + params.order.join(',') : '';
     let offset = all ? '' : '&offset=' + (params.startAt || 0);
     
     let filters = (params.filters || []).map(f => `${f.colName}='${f.value}'`);
-    let where = [params.where, ...filters].filter(w => !!w).join(' and ');
+    let where = encode([params.where, ...filters].filter(w => !!w).join(' and '));
       
     let startUrl = `${this.root}/data/${params.table}?pageSize=${Config.defaultPageSize}${props}${sort}${offset}&where=${where}`;
 

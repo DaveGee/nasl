@@ -1,12 +1,15 @@
 import moment from 'moment';
-import B from './backendless';
+import B from '../data/backendless';
+//import F from '../data/firebase';
 import Config from '../../config';
 import {normalize} from '../helpers/strings';
 import Identity from './identity';
 import Enums from '../helpers/enums';
 
 class ProductService {
-  constructor() { }
+  constructor(database) { 
+    
+  }
   
   get myList() {
     return this._list;
@@ -49,14 +52,14 @@ class ProductService {
    * 
    */
   loadShoppingList() {
-    if(Identity.user.list && Identity.user.objectId)
-      return B.fetchOne('users', Identity.user.objectId)
+    if(Identity.user.list && Identity.user.userId)
+      return B.fetchOne('users', Identity.user.userId)
         .then(user => {
           Identity.user.lost = user.list;
           return user.list;
         });
     else
-      return B.update('users', Identity.user.objectId, {
+      return B.update('users', Identity.user.userId, {
         list: {
           humanRef: Identity.user.name + '\'s list',
           items: [],

@@ -12,8 +12,10 @@ import Enums from './helpers/enums';
 import ProductService from './services/product-service';
 import Divider from 'material-ui/lib/divider';
 
-const boughtIcon = <FontIcon className="material-icons" color={color.teal600}>check_circle</FontIcon>;
-const neededIcon = <FontIcon className="material-icons" color={color.amber300}>report_problem</FontIcon>;
+// teal600
+const boughtIcon = <FontIcon className="material-icons" color={color.grey400}>check_circle</FontIcon>;
+// amber300
+const neededIcon = <FontIcon className="material-icons" color={color.amber400}>report_problem</FontIcon>;
 const vertIcon = <FontIcon className="material-icons" color={color.grey400}>more_vert</FontIcon>;
 
 export default class ProductItem extends React.Component {
@@ -139,6 +141,6 @@ export default class ProductItem extends React.Component {
                      primaryText={this.props.item.product.name}
                      secondaryText={lastBuyDate}
                      onTouchTap={this.switchState.bind(this)}
-                     innerDivStyle={{ color: this.state.needed ? color.grey900 : color.grey600 }}/>;
+                     style={{ color: this.state.needed ? color.grey900 : color.grey600 }}/>;
   }
 }

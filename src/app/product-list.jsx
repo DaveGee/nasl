@@ -36,13 +36,13 @@ export default class ProductList extends React.Component {
   }
   
   componentWillMount() {  
-    this.loadList(true);  // login did cache initial list
-    this.loadProducts();
+    this.loadList(true)  // login did cache initial list
+      .then(() => this.loadProducts());
   }
   
   mergeItems(products, items) {
-    if(!products || products.length === 0) return items;
     items = items || [];
+    if(!products || products.length === 0) return items;
     return products.map(p => items.find(i => i.product.objectId === p.objectId) || { product: p }).sort(productSorter);
   }
   
@@ -56,7 +56,7 @@ export default class ProductList extends React.Component {
   }
   
   loadList(cache = false) {
-    let listLoader = cache ?
+    let listLoader = cache && Identity.user.list ?
     function() { return Promise.resolve(Identity.user.list); }.bind(this) :
     ProductService.loadShoppingList;
     
@@ -80,9 +80,8 @@ export default class ProductList extends React.Component {
   
   handleNewProduct(product) {
     // add product to cache
-    console.log(product);
     this._products.push(product);
-    reloadItemsDelayed();
+    this.reloadItemsDelayed();
   }
 
   render() {
