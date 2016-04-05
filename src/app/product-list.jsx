@@ -14,16 +14,17 @@ import Identity from './services/identity';
 
 // tri : par needed, lastBuy
 function productSorter(a, b) {
+  
   // if < 0 => a smaller. if > 0 => b smaller
-  let aState = a || { needed: false, lastBuyTime: null };
-  let bState = b || { needed: false, lastBuyTime: null };
+  a = Object.assign({ needed: false, lastBuyTime: null }, a);
+  b = Object.assign({ needed: false, lastBuyTime: null }, b);
   
   // products marked as "needed" are always on top
-  let needed = !!bState.needed - !!aState.needed;
+  let needed = !!b.needed - !!a.needed;
   if(needed !== 0) return needed;
   
   // products almost empty are sorted by emptyness
-  return new Date(bState.lastBuyTime) - new Date(aState.lastBuyTime);
+  return new Date(b.lastBuyTime) - new Date(a.lastBuyTime);
 }
 
 export default class ProductList extends React.Component {
@@ -42,7 +43,7 @@ export default class ProductList extends React.Component {
   
   mergeItems(products, items) {
     items = items || [];
-    if(!products || products.length === 0) return items;
+    if(!products || products.length === 0) return items.sort(productSorter);
     return products.map(p => items.find(i => i.product.objectId === p.objectId) || { product: p }).sort(productSorter);
   }
   

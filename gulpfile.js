@@ -42,6 +42,8 @@ gulp.task('build', function() {
     .bundle()
     .on('error', prettyError)
     .pipe(source(config.bundleDest))
+    // .pipe(buffer())
+    // .pipe(uglify())
     .pipe(gulp.dest(config.rootDir))
     .pipe(browserSync.stream());
 });
