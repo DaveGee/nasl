@@ -85,6 +85,15 @@ class Backendless {
     .then(response => response.json());
   }
   
+  delete(tableName, itemId) {
+    return fetch(`${this.root}/data/${tableName}/${itemId}`, {
+      method: 'delete',
+      headers: Object.assign({}, Config.backendless.headers, {'user-token': this.getUserToken()}),
+      body: JSON.stringify(true)
+    })
+    .then(response => response.json());
+  }
+  
   create(tableName, item) {
     return fetch(`${this.root}/data/${tableName}`, {
       method: 'post',

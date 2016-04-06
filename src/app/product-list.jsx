@@ -21,10 +21,15 @@ function productSorter(a, b) {
   
   // products marked as "needed" are always on top
   let needed = !!b.needed - !!a.needed;
-  if(needed !== 0) return needed;
+  if (needed !== 0) return needed;
   
   // products almost empty are sorted by emptyness
-  return new Date(b.lastBuyTime) - new Date(a.lastBuyTime);
+  let dateCompare = new Date(b.lastBuyTime) - new Date(a.lastBuyTime);
+  if (dateCompare !== 0) return dateCompare;
+  
+  if (a.product.normalizedName < b.product.normalizedName) return -1;
+  if (a.product.normalizedName > b.product.normalizedName) return 1;
+  return 0;
 }
 
 export default class ProductList extends React.Component {

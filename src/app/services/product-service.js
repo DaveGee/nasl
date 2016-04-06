@@ -42,7 +42,7 @@ class ProductService {
   getAllProducts() {
     return B.fetch({
       table: 'products',
-      props: ['objectId', 'image', 'name'],
+      props: ['objectId', 'image', 'name', 'normalizedName'],
       order: ['name']
     }, true);
   }
@@ -79,29 +79,25 @@ class ProductService {
   cancelLastActions(shopListItem) {
     if (shopListItem.objectId) {
       
-      if(this.boughtRecently(shopListItem)) {
-        // if there's no history, or only the recent buy in history, delete buy times
-        if(!shopListItem.history || shopListItem.history.length < 2) {
-          shopListItem.lastBuyTime = null;
-          shopListItem.history = [];
-        } 
-        else {
-          // there's a _rather long_ history
-          shopListItem.history.sort(function(a, b) {
-            return new Date(b.buyTime) - new Date(a.buyTime);
-          });
+      var lastBuyTime = shopListItem.lastBuyTime;
+      
+      if(this.boughtRecently(shopListItem)
+        && shopListItem.history && shopListItem.history.length > 0) {
           
-          // delete the last one
-          shopListItem.history.shift();
-          shopListItem.lastBuyTime = shopListItem.history[0].buyTime;
-        }
+        shopListItem.history.sort(function(a, b) {
+          return new Date(b.buyTime) - new Date(a.buyTime);
+        });
+        
+        B.delete('buyingLog', shopListItem.history[0].objectId);
+        
+        lastBuyTime = shopListItem.history.length > 1 ? shopListItem.history[1].buyTime : null;
       }
       
-      // reset needed flag
-      shopListItem.needed = false;
-      
-      return B.update('listItems', shopListItem.objectId, shopListItem)
-        .then(() => shopListItem.lastBuyTime);
+      return B.update('listItems', shopListItem.objectId, {
+        needed: false,
+        lastBuyTime: lastBuyTime
+      })
+      .then(() => lastBuyTime);
     }
   }
   
