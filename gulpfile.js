@@ -4,7 +4,7 @@ var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 var less = require('gulp-less');
 var path = require('path');
-var minifyCSS = require('gulp-minify-css');
+var cleanCSS = require('gulp-clean-css');
 var browserSync = require('browser-sync').create();
 var prettyError = require('./build/build-utils');
 var config = require('./build/config');
@@ -54,7 +54,7 @@ gulp.task('less', function() {
       paths: [path.join(__dirname, 'less', 'includes')]
     }))
     .on('error', prettyError)
-    .pipe(minifyCSS())
+    .pipe(cleanCSS({compatibility: '*'}))
     .pipe(gulp.dest(config.rootDir))
     .pipe(browserSync.stream());
 });
