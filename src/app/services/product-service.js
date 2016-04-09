@@ -1,10 +1,10 @@
 import moment from 'moment';
 import B from '../data/backendless';
-//import F from '../data/firebase';
 import Config from '../../config';
 import {normalize} from '../helpers/strings';
 import Identity from './identity';
 import Enums from '../helpers/enums';
+import {meanBuyInterval} from '../business/prevision';
 
 class ProductService {
   constructor(database) { 
@@ -95,7 +95,8 @@ class ProductService {
       
       return B.update('listItems', shopListItem.objectId, {
         needed: false,
-        lastBuyTime: lastBuyTime
+        lastBuyTime: lastBuyTime,
+        meanBuyInterval: meanBuyInterval(shopListItem)
       })
       .then(() => lastBuyTime);
     }
@@ -116,7 +117,8 @@ class ProductService {
           needed: false,
           lastBuyTime: now,
           ___class: 'listItems',
-          history: updateHistory
+          history: updateHistory,
+          meanBuyInterval: meanBuyInterval(shopListItem)
         };
     
     if (shopListItem.objectId)
@@ -136,6 +138,7 @@ class ProductService {
    */
   setItemNeeded(shopListItem) {
     let diff = {
+                  meanBuyInterval: meanBuyInterval(shopListItem),
                   needed: true,
                   ___class: 'listItems'
                };
