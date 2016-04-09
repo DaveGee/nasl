@@ -12,7 +12,8 @@ import Enums from './helpers/enums';
 import ProductService from './services/product-service';
 import CircularProgress from 'material-ui/lib/circular-progress';
 import Divider from 'material-ui/lib/divider';
-import {getStockIndicator} from './business/stock-manager'
+import {getStockIndicator} from './business/stock-manager';
+import ItemStockIndicator from './item-stock-indicator';
 
 // teal600
 const boughtIcon = <FontIcon className="material-icons" color={color.grey400}>check_circle</FontIcon>;
@@ -60,14 +61,16 @@ export default class ProductItem extends React.Component {
     this.setState({ lastBuyTime: now, needed: false, loading: true });
   
     return ProductService.setItemBoughtNotNeeded(this.props.item, now)
-      .then(() => this.props.onItemStateChanged());
+      .then(() => this.props.onItemStateChanged())
+      .then(() => this.setState({ loading: false }));
   }
   
   setNeeded() {
     this.setState({ needed: true, loading: true });
     
     return ProductService.setItemNeeded(this.props.item)
-      .then(() => this.props.onItemStateChanged());
+      .then(() => this.props.onItemStateChanged())
+      .then(() => this.setState({ loading: false }));
   }
   
   cancelActions() {
@@ -80,7 +83,8 @@ export default class ProductItem extends React.Component {
     
     return ProductService.cancelLastActions(this.props.item)
       .then(previousBuyTime => this.setState({ lastBuyTime: previousBuyTime }))
-      .then(() => this.props.onItemStateChanged());
+      .then(() => this.props.onItemStateChanged())
+      .then(() => this.setState({ loading: false }));
   }
   
   menuChanged(event, value) {
@@ -143,7 +147,10 @@ export default class ProductItem extends React.Component {
     return <ListItem key={this.props.item.product.id}
                      leftAvatar={this.state.loading ? <CircularProgress size={0.6}/> : <Avatar src={this.props.item.product.image} />}
                      rightIconButton={rightIconMenu}
-                     primaryText={this.props.item.product.name}
+                     primaryText={<div className="item-title">
+                                    {this.props.item.product.name}
+                                    <ItemStockIndicator reserve={this.state.stockIndicator} />
+                                  </div>}
                      secondaryText={lastBuyDate}
                      onTouchTap={this.switchState.bind(this)}
                      style={{ color: this.state.needed ? color.grey900 : color.grey600 }}/>;

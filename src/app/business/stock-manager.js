@@ -27,5 +27,5 @@ export function getStockIndicator(listItem) {
   
   if(!listItem || !listItem.lastBuyTime || !listItem.meanBuyInterval) return null;
   
-  return Math.max(1 - ((new Date().getTime() - new Date(listItem.lastBuyTime)) / listItem.meanBuyInterval), 0);
+  return Math.max(1 - ((new Date() - new Date(listItem.lastBuyTime)) / (listItem.meanBuyInterval * 24 * 60 * 60 * 1000)), 0);
 }
