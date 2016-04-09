@@ -143,9 +143,13 @@ export default class ProductItem extends React.Component {
         <MenuItem primaryText="Fermer" />
       </IconMenu>
     );
+    
+    let glow = this.state.stockIndicator !== null && this.state.stockIndicator < 0.05 ? 
+                { animation: 'glow 3s ease-in-out infinite' } : {};
 
     return <ListItem key={this.props.item.product.id}
-                     leftAvatar={this.state.loading ? <CircularProgress size={0.6}/> : <Avatar src={this.props.item.product.image} />}
+                     leftAvatar={this.state.loading ? <CircularProgress size={0.6}/> : 
+                                                      <Avatar style={glow} src={this.props.item.product.image} />}
                      rightIconButton={rightIconMenu}
                      primaryText={<div className="item-title">
                                     {this.props.item.product.name}
@@ -153,6 +157,7 @@ export default class ProductItem extends React.Component {
                                   </div>}
                      secondaryText={lastBuyDate}
                      onTouchTap={this.switchState.bind(this)}
-                     style={{ color: this.state.needed ? color.grey900 : color.grey600 }}/>;
+                     style={{ color: this.state.needed ? color.grey900 : color.grey600 }}
+                     className="stock-item" />;
   }
 }
