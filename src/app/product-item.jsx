@@ -10,6 +10,7 @@ import * as color from 'material-ui/lib/styles/colors';
 import moment from 'moment';
 import Enums from './helpers/enums';
 import ProductService from './services/product-service';
+import CircularProgress from 'material-ui/lib/circular-progress';
 import Divider from 'material-ui/lib/divider';
 
 // teal600
@@ -30,7 +31,9 @@ export default class ProductItem extends React.Component {
     else if (ProductService.boughtRecently(props.item))
       initialMenuState = Enums.ItemState.Bought;
     
-    this.state = {      
+    this.state = {    
+      loading: false,
+        
       needed: props.item.needed,
       lastBuyTime: props.item.lastBuyTime,
       
@@ -53,22 +56,24 @@ export default class ProductItem extends React.Component {
       this.state.lastBuyTime :
       new Date().toISOString();
     
-    this.setState({ lastBuyTime: now, needed: false });
+    this.setState({ lastBuyTime: now, needed: false, loading: true });
   
     return ProductService.setItemBoughtNotNeeded(this.props.item, now)
       .then(() => this.props.onItemStateChanged());
   }
   
   setNeeded() {
-    this.setState({ needed: true });
+    this.setState({ needed: true, loading: true });
     
     return ProductService.setItemNeeded(this.props.item)
       .then(() => this.props.onItemStateChanged());
+      //.then(() => this.setState({ loading: false }));
   }
   
   cancelActions() {
     
     this.setState({
+      loading: true,
       needed: false,
       lastBuyTime: null   // ahem...
     });
@@ -136,7 +141,7 @@ export default class ProductItem extends React.Component {
     );
 
     return <ListItem key={this.props.item.product.id}
-                     leftAvatar={<Avatar src={this.props.item.product.image} />}
+                     leftAvatar={this.state.loading ? <CircularProgress size={0.6}/> : <Avatar src={this.props.item.product.image} />}
                      rightIconButton={rightIconMenu}
                      primaryText={this.props.item.product.name}
                      secondaryText={lastBuyDate}
