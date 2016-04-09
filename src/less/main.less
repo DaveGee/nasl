@@ -1,10 +1,11 @@
 @import "variables.less";
 @import "animations.less";
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,300,700);
 
 body {
   padding: 0;
   margin: 0;
-  font-family: Helvetica, sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 @media(min-width: @screen-switch) {
@@ -18,31 +19,24 @@ body {
   }
 }
 
-// body {
-//   font-family: Helvetica, sans-serif;
-//   align-items: center;
-//   display: flex;
-//   flex-direction: column;
-// }
-
-// .root {
-//   width: 600px;
-//   border: 1px solid #ccc;
-//   flex: 1;
-// }
-
-// .cart-widget {
-//   height: 100px;
-// }
-
-// .product-list {
-//   flex: 1;
+.welcome {
   
-//   ul {
-//     padding: 0;
-//   }
-//   li {
-//     list-style: none;
-//     padding: 0;
-//   }
-// }
+  position: fixed;
+  justify-content: center;
+  align-items: center;
+  left: 50%;
+  top: 50%;
+  width: 300px;
+  height: 150px;
+  margin-left: -150px;
+  margin-top: -75px;
+  
+  .welcome-content {
+    padding-top: 130px;
+    text-align: center;
+    color: #b0b0b0;
+    font-size: 1em;
+    background: no-repeat center top url(molly.png);
+    background-size: 100px 120px;
+  }
+}

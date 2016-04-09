@@ -20,4 +20,12 @@ export function meanBuyInterval(listItem) {
       }) / (buyTimes.length - 1));
       
   return meanDays;
+};
+
+
+export function getStockIndicator(listItem) {
+  
+  if(!listItem || !listItem.lastBuyTime || !listItem.meanBuyInterval) return null;
+  
+  return Math.max(1 - ((new Date().getTime() - new Date(listItem.lastBuyTime)) / listItem.meanBuyInterval), 0);
 }

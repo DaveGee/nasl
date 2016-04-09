@@ -6,6 +6,11 @@ import FlatButton from 'material-ui/lib/flat-button';
 import AutoComplete from 'material-ui/lib/auto-complete';
 import ProductService from './services/product-service';
 
+const dialogStyle = {
+  width: '100%',
+  maxWidth: 'none'
+};
+
 export default class Header extends React.Component {
   constructor(props) {
     super(props);
@@ -68,6 +73,7 @@ export default class Header extends React.Component {
         modal={false}
         open={this.state.addingItem}
         onRequestClose={this.closeDialog.bind(this) }
+        contentStyle={dialogStyle}
         >
         <AutoComplete
           onNewRequest={this.handleRequest.bind(this)}

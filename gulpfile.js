@@ -11,6 +11,7 @@ var config = require('./build/config');
 var uglify = require('gulp-uglify');
 var htmlReplace = require('gulp-html-replace');
 var autoprefixer = require('gulp-autoprefixer');
+var cssBase64 = require('gulp-css-base64');
 
 gulp.task('libs', function() {
   var b = browserify({
@@ -59,6 +60,10 @@ gulp.task('less', function() {
 			browsers: ['last 2 versions'],
 			cascade: false
 		}))
+    .pipe(cssBase64({
+      baseDir: "../../data",
+      extensionsAllowed: ['.gif', '.png']
+    }))
     .pipe(cleanCSS({compatibility: '*'}))
     .pipe(gulp.dest(config.rootDir))
     .pipe(browserSync.stream());

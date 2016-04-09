@@ -4,7 +4,7 @@ import Config from '../../config';
 import {normalize} from '../helpers/strings';
 import Identity from './identity';
 import Enums from '../helpers/enums';
-import {meanBuyInterval} from '../business/prevision';
+import {meanBuyInterval} from '../business/stock-manager';
 
 class ProductService {
   constructor(database) { 

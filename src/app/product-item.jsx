@@ -12,6 +12,7 @@ import Enums from './helpers/enums';
 import ProductService from './services/product-service';
 import CircularProgress from 'material-ui/lib/circular-progress';
 import Divider from 'material-ui/lib/divider';
+import {getStockIndicator} from './business/stock-manager'
 
 // teal600
 const boughtIcon = <FontIcon className="material-icons" color={color.grey400}>check_circle</FontIcon>;
@@ -37,13 +38,13 @@ export default class ProductItem extends React.Component {
       needed: props.item.needed,
       lastBuyTime: props.item.lastBuyTime,
       
-      menuValue: initialMenuState
+      menuValue: initialMenuState,
+      
+      stockIndicator: getStockIndicator(props.item)
     };
   }
   
-  switchState() {
-    // nothing --> needed --> bought(-needed) --> needed(+bought) --> bought ...
-    
+  switchState() {    
     if(!this.state.needed)
       this.setNeeded();
     else {
@@ -67,15 +68,14 @@ export default class ProductItem extends React.Component {
     
     return ProductService.setItemNeeded(this.props.item)
       .then(() => this.props.onItemStateChanged());
-      //.then(() => this.setState({ loading: false }));
   }
   
   cancelActions() {
     
     this.setState({
       loading: true,
-      needed: false,
-      lastBuyTime: null   // ahem...
+      needed: false
+      //lastBuyTime: null   // ahem...
     });
     
     return ProductService.cancelLastActions(this.props.item)
