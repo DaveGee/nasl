@@ -88,9 +88,9 @@ class ProductService {
           return new Date(b.buyTime) - new Date(a.buyTime);
         });
         
-        B.delete('buyingLog', shopListItem.history[0].objectId);
-        
         lastBuyTime = shopListItem.history.length > 1 ? shopListItem.history[1].buyTime : null;
+        
+        B.delete('buyingLog', shopListItem.history[0].objectId);
       }
       
       return B.update('listItems', shopListItem.objectId, {
