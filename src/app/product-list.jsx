@@ -3,6 +3,7 @@ import Header from './header';
 import ProductListView from './product-list-view';
 import ProductService from './services/product-service';
 import Identity from './services/identity';
+import Config from '../config';
 
 
 // actions : 
@@ -81,7 +82,7 @@ export default class ProductList extends React.Component {
     this._reloading = setTimeout(() => {
       this._reloading = null;
       this.loadList();
-    }, 1500);
+    }, Config.refreshInterval);
   }
   
   handleNewProduct(product) {

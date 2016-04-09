@@ -5,6 +5,7 @@ import Subheader from 'material-ui/lib/Subheader';
 import ProductItem from './product-item';
 import IconButton from 'material-ui/lib/icon-button';
 import ProductService from './services/product-service';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 export default class ProductList extends React.Component {
   constructor(props) {
@@ -31,7 +32,9 @@ export default class ProductList extends React.Component {
     return <div>
       <List>
         <Subheader inset={true}>Ma liste habituelle</Subheader>
-        {this.props.items.filter(p => isInShopList(p)).map(toItem) }
+        <ReactCSSTransitionGroup transitionName="mylist" transitionEnterTimeout={500} transitionLeaveTimeout={300}>
+          {this.props.items.filter(p => isInShopList(p)).map(toItem) }
+        </ReactCSSTransitionGroup>
       </List>
       <Divider inset={true} />
       <List>
