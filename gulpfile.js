@@ -10,6 +10,7 @@ var prettyError = require('./build/build-utils');
 var config = require('./build/config');
 var uglify = require('gulp-uglify');
 var htmlReplace = require('gulp-html-replace');
+var autoprefixer = require('gulp-autoprefixer');
 
 gulp.task('libs', function() {
   var b = browserify({
@@ -54,6 +55,10 @@ gulp.task('less', function() {
       paths: [path.join(__dirname, 'less', 'includes')]
     }))
     .on('error', prettyError)
+		.pipe(autoprefixer({
+			browsers: ['last 2 versions'],
+			cascade: false
+		}))
     .pipe(cleanCSS({compatibility: '*'}))
     .pipe(gulp.dest(config.rootDir))
     .pipe(browserSync.stream());

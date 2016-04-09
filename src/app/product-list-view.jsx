@@ -39,7 +39,9 @@ export default class ProductList extends React.Component {
       <Divider inset={true} />
       <List>
         <Subheader inset={true}>Tous les autres produits</Subheader>
-        {this.props.items.filter(p => !isInShopList(p)).map(toItem) }
+        <ReactCSSTransitionGroup transitionName="mylist" transitionEnterTimeout={500} transitionLeaveTimeout={300}>
+          {this.props.items.filter(p => !isInShopList(p)).map(toItem) }
+        </ReactCSSTransitionGroup>
       </List>
     </div >;
   }
