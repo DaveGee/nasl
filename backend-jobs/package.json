@@ -1,0 +1,16 @@
+{
+  "name": "NASL-servercode",
+  "version": "1.0.0",
+  "scripts": {
+    "debug": "coderunner debug",
+    "deploy": "coderunner deploy"
+  },
+  "devDependencies": {
+    "backendless-coderunner": ">=1.0.0"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "moment": "^2.12.0",
+    "request": "^2.70.0"
+  }
+}
