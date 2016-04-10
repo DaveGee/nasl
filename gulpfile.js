@@ -35,17 +35,22 @@ gulp.task('libs', function() {
 });
 
 gulp.task('build', function() {
-  return browserify({
+  var build = browserify({
     entries: config.src.react,
     extensions: ['.jsx', '.js'],
-    debug: true
+    debug: config.env !== 'prod'
   })
     .transform('babelify', { presets: ['es2015', 'react'] })
     .bundle()
     .on('error', prettyError)
     .pipe(source(config.bundleDest))
-    // .pipe(buffer())
-    // .pipe(uglify())
+  
+  if(config.env === 'prod')
+    build = build
+      .pipe(buffer())
+      .pipe(uglify());
+  
+  return build
     .pipe(gulp.dest(config.rootDir))
     .pipe(browserSync.stream());
 });

@@ -1,4 +1,6 @@
 module.exports = {
+  env: 'dev', //dev|prod
+  
   rootDir: './dist',
   
   libsDest: 'libs.js',
