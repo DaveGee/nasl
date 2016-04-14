@@ -1,6 +1,9 @@
 /src/config.js
+/data/bingkey.js
+
+.vscode/
 
 /node_modules
-/data
+/data/misc
 /dist
 /backend-jobs/node_modules

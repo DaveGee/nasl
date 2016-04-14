@@ -1,0 +1,2 @@
+
+require('./refresh-images.js'); 
