@@ -24,6 +24,7 @@ class ProductService {
       table: 'products',
       props: ['objectId', 'image', 'name'],
       order: ['name'],
+      where: `(ownerId is null or ownerId='${Identity.user.objectId}')`,
       startAt: offset || 0
     }, false)
       .then(function(response) {
@@ -43,6 +44,7 @@ class ProductService {
     return B.fetch({
       table: 'products',
       props: ['objectId', 'image', 'name', 'normalizedName'],
+      where: `(ownerId is null or ownerId='${Identity.user.objectId}')`,
       order: ['name']
     }, true);
   }
@@ -165,6 +167,7 @@ class ProductService {
     return B.fetch({
       table: 'products',
       props: ['objectId', 'name', 'normalizedName'],
+      where: `(ownerId is null or ownerId='${Identity.user.objectId}')`,
       filters: [{ colName: 'normalizedName', value: normalize(name) }]
     }, false)
       // product found ?      
