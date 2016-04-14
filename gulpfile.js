@@ -66,7 +66,7 @@ gulp.task('less', function() {
 			cascade: false
 		}))
     .pipe(cssBase64({
-      baseDir: "../../data",
+      baseDir: "../../images",
       extensionsAllowed: ['.gif', '.png']
     }))
     .pipe(cleanCSS({compatibility: '*'}))
