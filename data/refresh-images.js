@@ -13,7 +13,8 @@ var lineReader = require('readline').createInterface({
 
 lineReader.on('close', function () {
   Promise.all(productPromises)
-    .then(processData);
+    .then(processData)
+    .catch(error);
 });
 
 lineReader.on('line', function (line) {
@@ -54,9 +55,7 @@ function processData(data) {
           .then(function(res) {
             console.log('Saved: ' + products[i].name)
           })
-          .catch(function(err) {
-            console.log('Err: ', arguments);
-          });
+          .catch(error);
           
         // api limit to 50req/sec on backendless
         setTimeout(sendToBackendLess.bind(undefined, i+1), 100);
@@ -80,9 +79,6 @@ function reqObjectId(normalizedName) {
   })
     .then(function (obj) {
       return obj && obj.data && obj.data.length > 0 ? obj.data[0].objectId : null;
-    })
-    .catch(function (err) {
-      console.log(err);
     });
 }
 
@@ -115,20 +111,50 @@ var auth = new Buffer(key + ':' + key).toString('base64');
 var rootUri = 'https://api.datamarket.azure.com/Bing/Search/v1/Image';
 var options = encodeURIComponent("'DisableLocationDetection'");
 var adult = encodeURIComponent("'Strict'");
-var filters = encodeURIComponent("'Size:Medium+Aspect:Square'");
+var filters = encodeURIComponent("'Size:Small+Aspect:Square'");
+
+function firstOk(imageArr, i) {
+  return request({
+      url: imageArr[i],
+      method: 'head'
+    })
+    .then(function() {
+      //console.log('ok', imageArr[i]);
+      return imageArr[i];
+    })
+    .catch(function() {
+      //console.log('notok', imageArr[i]);
+      if(i < imageArr.length - 1)
+        return firstOk(imageArr, i+1)
+      return null;
+    });
+}
 
 function reqImage(keyWord) {
   var q = encodeURIComponent('\'' + keyWord + '\'');
 
   return request({
-    url: `${rootUri}?Query=${q}&Options=${options}&Adult=${adult}&ImageFilters=${filters}&$top=1`,
+    url: `${rootUri}?Query=${q}&Options=${options}&Adult=${adult}&ImageFilters=${filters}&$top=5`,
     method: 'get',
     json: true,
     headers: {
       'Authorization': 'Basic ' + auth
     }
   })
-    .then(function (imgJson) {
-      return imgJson.d.results[0].MediaUrl;
+  .then(function (res) {
+    var imgs = res.d.results.map(function(r) {
+      return r.MediaUrl;
     });
+    return firstOk(imgs, 0);
+    
+    // request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+    // return imgJson.d.results[0].MediaUrl;
+  })
+  .catch(error);
+}
+
+
+function error() {
+  console.log('Err: ', arguments);
+  throw arguments[0];
 }
