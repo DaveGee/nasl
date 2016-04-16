@@ -5,6 +5,7 @@ var request = require('./requestp').request,
   config = require('./config');
 
 var productPromises = [];
+var products = [];
 
 var lineReader = require('readline').createInterface({
   input: fs.createReadStream('products.txt')
@@ -23,24 +24,47 @@ lineReader.on('line', function (line) {
     reqImage(line),
     reqObjectId(normalizedName)
   ])
-    .then(function (values) {
+  .then(function (values) {
 
-      var imgUrl = values[0];
-      var id = values[1];
+    var imgUrl = values[0];
+    var id = values[1];
 
-      return {
-        name: line,
-        normalizedName: normalizedName,
-        image: imgUrl,
-        objectId: id
-      };
-    }));
+    var o = {
+      name: line,
+      normalizedName: normalizedName,
+      image: imgUrl,
+      objectId: id
+    };
+    
+    products.push(o);
+    return o;
+  }));
 });
 
 function processData(data) {
   // write producDb to a file
   fs.writeFile('products.json', JSON.stringify(data), function (err) {
     if (err) console.log('Err: ' + err);
+    else console.log('Wrote ' + data.length + ' object in products.json');
+    
+    var sendToBackendLess = function(i) {
+      
+      if(i<products.length) {
+        updateObjectInDb(products[i])
+          .then(function(res) {
+            console.log('Saved: ' + products[i].name)
+          })
+          .catch(function(err) {
+            console.log('Err: ', arguments);
+          });
+          
+        // api limit to 50req/sec on backendless
+        setTimeout(sendToBackendLess.bind(undefined, i+1), 100);
+      }
+    }
+    
+    sendToBackendLess(0);
+    
   });
 }
 
@@ -48,7 +72,6 @@ function processData(data) {
 function reqObjectId(normalizedName) {
   var q = encodeURIComponent(`normalizedName='${normalizedName}'`)
   var url = `${config.backendless.url}/${config.backendless.version}/data/products?props=objectId&where=${q}`;
-  console.log(url);
   return request({
     url: url,
     method: 'get',
@@ -56,12 +79,35 @@ function reqObjectId(normalizedName) {
     headers: config.backendless.headers
   })
     .then(function (obj) {
-      console.log(obj);
       return obj && obj.data && obj.data.length > 0 ? obj.data[0].objectId : null;
     })
     .catch(function (err) {
       console.log(err);
     });
+}
+
+function updateObjectInDb(object) {
+
+  var url = `${config.backendless.url}/${config.backendless.version}/data/products`;
+
+  if (object.objectId) {
+    return request({
+      url: url + '/' + object.objectId,
+      method: 'put',
+      json: true,
+      headers: config.backendless.headers,
+      body: object
+    });
+  }
+  else {
+    return request({
+      url: url,
+      method: 'post',
+      json: true,
+      headers: config.backendless.headers,
+      body: object
+    });
+  }
 }
 
 var key = config.bingKey; // replace by the bing API key
@@ -73,7 +119,7 @@ var filters = encodeURIComponent("'Size:Medium+Aspect:Square'");
 
 function reqImage(keyWord) {
   var q = encodeURIComponent('\'' + keyWord + '\'');
-  
+
   return request({
     url: `${rootUri}?Query=${q}&Options=${options}&Adult=${adult}&ImageFilters=${filters}&$top=1`,
     method: 'get',
