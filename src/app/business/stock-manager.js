@@ -1,7 +1,7 @@
 export function meanBuyInterval(listItem) {
 
-  if (!listItem || !listItem.history)
-    throw 'Invalid item or no history';
+  if (!listItem || !listItem.history || listItem.history.length === 0)
+    return null;
 
   var buyTimes = listItem.history.slice(0, 20)
     .map(h => new Date(h.buyTime))
