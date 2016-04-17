@@ -5,6 +5,8 @@ import Dialog from 'material-ui/lib/dialog';
 import FlatButton from 'material-ui/lib/flat-button';
 import AutoComplete from 'material-ui/lib/auto-complete';
 import ProductService from './services/product-service';
+import Menu from './menu';
+
 
 const dialogStyle = {
   width: '100%',
@@ -16,7 +18,8 @@ export default class Header extends React.Component {
     super(props);
 
     this.state = {
-      addingItem: false
+      addingItem: false,
+      menuOpen: false,
     };
   }
 
@@ -41,6 +44,10 @@ export default class Header extends React.Component {
   handleDialogOk() {
     this.addItem(this._autoComplete.state.searchText);
   }
+  
+  handleMenu(open) {
+    this.setState({ menuOpen: open });
+  }
 
   render() {
 
@@ -64,9 +71,13 @@ export default class Header extends React.Component {
     ];
 
     return <div> 
-      <AppBar title= "Les courses"
-        iconElementRight= { buttonAdd }
+      <AppBar title="Les courses"
+        iconElementRight={ buttonAdd }
+        onLeftIconButtonTouchTap={this.handleMenu.bind(this, true)}
         />
+      <Menu open={this.state.menuOpen}
+            onRequestChange={this.handleMenu.bind(this)} 
+            />
       <Dialog
         title="Ajouter un truc à la liste"
         actions={actions}
