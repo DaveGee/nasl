@@ -10,6 +10,10 @@ class Identity {
     return this._user;
   }
   
+  isUnknown() {
+    return !localStorage.getItem('nasl-user');
+  }
+  
   setList(list) {
     this._user.list = list;
   }

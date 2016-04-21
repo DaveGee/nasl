@@ -4,7 +4,7 @@ import Divider from 'material-ui/lib/divider';
 import Subheader from 'material-ui/lib/Subheader';
 import ProductItem from './product-item';
 import IconButton from 'material-ui/lib/icon-button';
-import ProductService from './services/product-service';
+import ProductService from '../../services/product-service';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 export default class ProductList extends React.Component {

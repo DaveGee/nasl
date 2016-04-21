@@ -1,5 +1,7 @@
 import React from 'react';
 import LeftNav from 'material-ui/lib/left-nav';
+import User from './user';
+import CurrentList from './current-list';
 
 export default class Menu extends React.Component {
   constructor(props) {
@@ -14,7 +16,8 @@ export default class Menu extends React.Component {
           docked={false}
           width={350}
         >
-        
+        <User />
+        <CurrentList />
       </LeftNav>;
   }
 }

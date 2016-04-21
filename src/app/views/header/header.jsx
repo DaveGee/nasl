@@ -4,7 +4,7 @@ import IconButton from 'material-ui/lib/icon-button';
 import Dialog from 'material-ui/lib/dialog';
 import FlatButton from 'material-ui/lib/flat-button';
 import AutoComplete from 'material-ui/lib/auto-complete';
-import ProductService from './services/product-service';
+import ProductService from '../../services/product-service';
 import Menu from './menu';
 
 

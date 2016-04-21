@@ -1,9 +1,9 @@
 import React from 'react';
-import Header from './header';
+import Header from '../header/header';
 import ProductListView from './product-list-view';
-import ProductService from './services/product-service';
-import Identity from './services/identity';
-import Config from '../config';
+import ProductService from '../../services/product-service';
+import Identity from '../../services/identity';
+import Config from '../../../config';
 
 
 // actions : 
@@ -93,7 +93,9 @@ export default class ProductList extends React.Component {
 
   render() {
     return <div>
-      <Header products={this.state.items.map(i => i.product.name)} onProductSelected={this.handleNewProduct.bind(this)} />
+      <Header products={this.state.items.map(i => i.product.name)} 
+              onProductSelected={this.handleNewProduct.bind(this)}
+              />
       <ProductListView items={this.state.items} onItemStateChanged={this.reloadItemsDelayed.bind(this)} />
     </div >;
   }

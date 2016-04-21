@@ -57,7 +57,7 @@ class ProductService {
     if(Identity.user.list && Identity.user.userId)
       return B.fetchOne('users', Identity.user.userId)
         .then(user => {
-          Identity.user.lost = user.list;
+          Identity.user.list = user.list;
           return user.list;
         });
     else
