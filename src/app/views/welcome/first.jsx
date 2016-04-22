@@ -1,6 +1,6 @@
 import React from 'react';
-import TextField from 'material-ui/lib/text-field';
-import Toggle from 'material-ui/lib/toggle';
+import TextField from 'material-ui/TextField';
+import Toggle from 'material-ui/toggle';
 
 export default class First extends React.Component {
   constructor(props) {

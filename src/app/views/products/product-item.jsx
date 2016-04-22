@@ -1,17 +1,17 @@
 import React from 'react';
-import ListItem from 'material-ui/lib/lists/list-item';
-import IconButton from 'material-ui/lib/icon-button';
-import FontIcon from 'material-ui/lib/font-icon';
-import IconMenu from 'material-ui/lib/menus/icon-menu';
-import MenuItem from 'material-ui/lib/menus/menu-item';
-import Unknown from 'material-ui/lib/svg-icons/action/help';
-import Avatar from 'material-ui/lib/avatar';
-import * as color from 'material-ui/lib/styles/colors';
+import {ListItem} from 'material-ui/List';
+import IconButton from 'material-ui/IconButton';
+import FontIcon from 'material-ui/FontIcon';
+import IconMenu from 'material-ui/IconMenu';
+import MenuItem from 'material-ui/MenuItem';
+import Unknown from 'material-ui/svg-icons/action/help';
+import Avatar from 'material-ui/avatar';
+import * as color from 'material-ui/styles/colors';
 import moment from 'moment';
 import Enums from '../../helpers/enums';
 import ProductService from '../../services/product-service';
-import CircularProgress from 'material-ui/lib/circular-progress';
-import Divider from 'material-ui/lib/divider';
+import CircularProgress from 'material-ui/CircularProgress';
+import Divider from 'material-ui/divider';
 import {getStockIndicator} from '../../business/stock-manager';
 import ItemStockIndicator from './item-stock-indicator';
 

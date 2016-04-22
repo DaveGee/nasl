@@ -1,5 +1,5 @@
 import React from 'react';
-import LeftNav from 'material-ui/lib/left-nav';
+import LeftNav from 'material-ui/Drawer';
 import User from './user';
 import CurrentList from './current-list';
 

@@ -4,7 +4,10 @@ import First from './app/views/welcome/first';
 import ProductList from './app/views/products/product-list';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import Identity from './app/services/identity';
-import Dialog from 'material-ui/lib/dialog';
+import Dialog from 'material-ui/dialog';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 
 
 // Needed for onTouchTap
@@ -26,9 +29,28 @@ injectTapEventPlugin();
   // creer/rejoindre liste
   // pas anonyme :
   
-if(Identity.isUnknown()) {
+//const theme = darkBaseTheme;
+  
+function renderError(code, message) {
   ReactDom.render(
-    <First />,
+    <MuiThemeProvider muiTheme={getMuiTheme()}>
+        <Dialog
+          title="Error at login"
+          modal={true}
+          open={true}
+        >
+          {code}: {message}
+        </Dialog>
+    </MuiThemeProvider>,          
+    document.querySelector('.root')
+  );
+} 
+  
+if(!Identity.isUnknown()) {
+  ReactDom.render(
+    <MuiThemeProvider muiTheme={getMuiTheme()}>
+      <First />
+    </MuiThemeProvider>,
     document.querySelector('.root')
   );
 }
@@ -37,25 +59,13 @@ else {
   Identity.auth()
     .then(() => {
       ReactDom.render(
-        <ProductList />,
+        <MuiThemeProvider muiTheme={getMuiTheme()}>
+          <ProductList />
+        </MuiThemeProvider>,
         document.querySelector('.root')
       );    
     })
-    .catch(error => {
-      
-      function renderError(code, message) {
-        ReactDom.render(
-              <Dialog
-                title="Error at login"
-                modal={true}
-                open={true}
-              >
-                {code}: {message}
-              </Dialog>,          
-              document.querySelector('.root')
-            );
-      } 
-      
+    .catch(error => {      
       if(error.response) {
         error.response.json()
           .then(body => renderError(body.code, body.message));

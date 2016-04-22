@@ -1,5 +1,5 @@
 import React from 'react';
-import * as color from 'material-ui/lib/styles/colors';
+import * as color from 'material-ui/styles/colors';
 
 const gradient = [
   color.deepOrange900,

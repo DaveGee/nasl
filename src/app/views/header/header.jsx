@@ -1,9 +1,9 @@
 import React from 'react';
-import AppBar from 'material-ui/lib/app-bar';
-import IconButton from 'material-ui/lib/icon-button';
-import Dialog from 'material-ui/lib/dialog';
-import FlatButton from 'material-ui/lib/flat-button';
-import AutoComplete from 'material-ui/lib/auto-complete';
+import AppBar from 'material-ui/AppBar';
+import IconButton from 'material-ui/IconButton';
+import Dialog from 'material-ui/dialog';
+import FlatButton from 'material-ui/FlatButton';
+import AutoComplete from 'material-ui/AutoComplete';
 import ProductService from '../../services/product-service';
 import Menu from './menu';
 
