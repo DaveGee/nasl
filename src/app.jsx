@@ -46,7 +46,7 @@ function renderError(code, message) {
   );
 } 
   
-if(!Identity.isUnknown()) {
+if(Identity.isUnknown()) {
   ReactDom.render(
     <MuiThemeProvider muiTheme={getMuiTheme()}>
       <First />

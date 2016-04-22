@@ -1,44 +1,49 @@
 import React from 'react';
 import TextField from 'material-ui/TextField';
 import Toggle from 'material-ui/toggle';
+import RaisedButton from 'material-ui/RaisedButton';
 
 export default class First extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      simple: true
+      simple: true,
+      join: false
     };
   }
   
-  handleToggle() {
-    this.setState({
-      simple: !this.state.simple
-    });
+  handleToggle(stateVal) {
+    var state = {};
+    state[stateVal] = !this.state[stateVal];
+    this.setState(state);
+  }
+  
+  handleConnect() {
+    console.log('connect');
   }
   
   render() {
     return <div className='welcome'>
         <h1>Hello!</h1>
-        <div>C'est comment ton nom ?<br />
-          <TextField />
-        </div>
-        <div>
-          <Toggle
-            label="Profil simplifié (sans password)"
-            defaultToggled={true}
-            toggled={this.state.simple}
-            onToggle={this.handleToggle.bind(this)}
-          />
-        </div>
+        <TextField hintText="Quel est ton nom ?" floatingLabelText="Quel est ton nom ?" />
+        <Toggle
+          label="Profil simplifié (sans password)"
+          toggled={this.state.simple}
+          onToggle={this.handleToggle.bind(this, 'simple')}
+        />
         <div style={{display: this.state.simple ? 'none' : 'block'}}>
-          Email, password
+          <TextField hintText="Email" floatingLabelText="Email" /><br />
+          <TextField hintText="Mot-de-passe" floatingLabelText="Mot-de-passe" type="password" />
         </div>
-        <div> 
-          Créer une nouvelle liste, ou rejoindre une liste partagée (textbox pour ref. de la list)
+        <Toggle
+          label="Rejoindre une liste existante?"
+          toggled={this.state.join}
+          onToggle={this.handleToggle.bind(this, 'join')}
+          />
+        <div style={{display: this.state.join ? 'block' : 'none'}}>
+          <TextField hintText="Entrer le code secret" floatingLabelText="Entrer le code secret" />
         </div>
-        <div>
-          [commencer]
-        </div>
+        <RaisedButton label="Commencer!" primary={true} onTouchEnd={() => this.handleConnect()} />
       </div>;
   }
 }
