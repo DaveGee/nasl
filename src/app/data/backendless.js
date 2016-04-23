@@ -20,12 +20,8 @@ class Backendless {
     return `${Config.backendless.url}/${Config.backendless.version}`;
   }
   
-  saveUserToken(userToken) {
-    localStorage.setItem('nasl-user-token', userToken);
-  }
-  
   getUserToken() {
-    return localStorage.getItem('nasl-user-token');
+    return Identity.Cache.UserToken;
   }
 
   login(credentials) {
@@ -42,6 +38,7 @@ class Backendless {
       // session is not ok, login and download data
       .catch(err => {
         console.log(err);
+        
         return fetch(`${this.root}/users/login`,
         {
           method: 'post',
@@ -52,7 +49,7 @@ class Backendless {
         .then(response => response.json())
         .then(data => {
           // save token
-          this.saveUserToken(data['user-token']);
+          Identity.Cache.UserToken = data['user-token'];
           return data;  // return user
         });
       })
@@ -74,6 +71,10 @@ class Backendless {
       });
     else
       return Promise.reject('No security token');
+  }
+  
+  updateName(newName) {
+    return this.update('users', Identity.User.objectId, { name: newName });
   }
   
   update(tableName, itemId, itemProps) {

@@ -8,6 +8,6 @@ export default class User extends React.Component {
   }
   
   render() {
-    return <div>{Identity.user.name}</div>;
+    return <div>{Identity.User.name}</div>;
   }
 }

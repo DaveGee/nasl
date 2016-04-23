@@ -24,7 +24,7 @@ class ProductService {
       table: 'products',
       props: ['objectId', 'image', 'name'],
       order: ['name'],
-      where: `(ownerId is null or ownerId='${Identity.user.objectId}')`,
+      where: `(ownerId is null or ownerId='${Identity.User.objectId}')`,
       startAt: offset || 0
     }, false)
       .then(function(response) {
@@ -44,7 +44,7 @@ class ProductService {
     return B.fetch({
       table: 'products',
       props: ['objectId', 'image', 'name', 'normalizedName'],
-      where: `(ownerId is null or ownerId='${Identity.user.objectId}')`,
+      where: `(ownerId is null or ownerId='${Identity.User.objectId}')`,
       order: ['name']
     }, true);
   }
@@ -54,22 +54,22 @@ class ProductService {
    * 
    */
   loadShoppingList() {
-    if(Identity.user.list && Identity.user.userId)
-      return B.fetchOne('users', Identity.user.userId)
+    if(Identity.User.list && Identity.User.userId)
+      return B.fetchOne('users', Identity.User.userId)
         .then(user => {
-          Identity.user.list = user.list;
+          Identity.User.list = user.list;
           return user.list;
         });
     else
-      return B.update('users', Identity.user.userId, {
+      return B.update('users', Identity.User.userId, {
         list: {
-          humanRef: Identity.user.name + '\'s list',
+          humanRef: Identity.User.name + '\'s list',
           items: [],
           ___class: 'lists'
         }
       })
       .then(user => {
-        Identity.user.list = user.list;
+        Identity.User.list = user.list;
         return user.list;
       });
   }
@@ -126,7 +126,7 @@ class ProductService {
     if (shopListItem.objectId)
       return B.update('listItems', shopListItem.objectId, diff);
     else
-      return B.update('lists', Identity.user.list.objectId,
+      return B.update('lists', Identity.User.list.objectId,
         {
           items: [
             Object.assign(diff, shopListItem)
@@ -148,7 +148,7 @@ class ProductService {
     if (shopListItem.objectId)
       return B.update('listItems', shopListItem.objectId, diff);
     else
-      return B.update('lists', Identity.user.list.objectId,
+      return B.update('lists', Identity.User.list.objectId,
         {
           items: [
             Object.assign(diff, shopListItem)
@@ -167,7 +167,7 @@ class ProductService {
     return B.fetch({
       table: 'products',
       props: ['objectId', 'name', 'normalizedName'],
-      where: `(ownerId is null or ownerId='${Identity.user.objectId}')`,
+      where: `(ownerId is null or ownerId='${Identity.User.objectId}')`,
       filters: [{ colName: 'normalizedName', value: normalize(name) }]
     }, false)
       // product found ?      
@@ -186,8 +186,8 @@ class ProductService {
       .then(product => {
         let item = { product: product }; // create a new one if none found
         // find item related to product in the cache
-        if(Identity.user.list)
-          item = Identity.user.list.items.find(i => i.product.objectId === product.objectId) || { product: product };
+        if(Identity.User.list)
+          item = Identity.User.list.items.find(i => i.product.objectId === product.objectId) || { product: product };
         
         // save new item in backend
         return this.setItemNeeded(item)

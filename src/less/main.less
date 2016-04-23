@@ -2,6 +2,7 @@
 @import "animations.less";
 @import "items.less";
 @import url(https://fonts.googleapis.com/css?family=Roboto:400,300,700);
+@import (reference) '../../node_modules/material-colors/dist/colors.less';
 
 body {
   padding: 0;
@@ -21,7 +22,6 @@ body {
 }
 
 .welcome {
-  
   position: fixed;
   justify-content: center;
   align-items: center;
@@ -40,4 +40,13 @@ body {
     background: no-repeat center top url(molly.png);
     background-size: 100px 120px;
   }
+}
+
+.welcome-screen {
+  padding: 40px;
+  height: 100vh;
+}
+
+.error {
+  color: @md-red-400;
 }

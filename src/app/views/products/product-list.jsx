@@ -63,8 +63,8 @@ export default class ProductList extends React.Component {
   }
   
   loadList(cache = false) {
-    let listLoader = cache && Identity.user.list ?
-    function() { return Promise.resolve(Identity.user.list); }.bind(this) :
+    let listLoader = cache && Identity.User.list ?
+    function() { return Promise.resolve(Identity.User.list); }.bind(this) :
     ProductService.loadShoppingList;
     
     return listLoader()

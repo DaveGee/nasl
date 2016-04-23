@@ -6,8 +6,8 @@ export default class CurrentList extends React.Component {
     super(props);
     
     this.state = {
-      listName: Identity.user.list.humanRef,
-      listId: Identity.user.list.objetId
+      listName: Identity.User.list.humanRef,
+      listId: Identity.User.list.objetId
     };
   }
   

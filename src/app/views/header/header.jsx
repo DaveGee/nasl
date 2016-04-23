@@ -52,9 +52,9 @@ export default class Header extends React.Component {
   render() {
 
     const buttonAdd = <IconButton touch={true}
-      onTouchTap={this.openDialogAdd.bind(this) }
-      iconClassName="material-icons">add
-    </IconButton>;
+                        onTouchTap={this.openDialogAdd.bind(this) }
+                        iconClassName="material-icons">add
+                      </IconButton>;
 
     const actions = [
       <FlatButton
