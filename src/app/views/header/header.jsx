@@ -77,6 +77,7 @@ export default class Header extends React.Component {
         />
       <Menu open={this.state.menuOpen}
             onRequestChange={this.handleMenu.bind(this)} 
+            userInfos={this.props.userInfos}
             />
       <Dialog
         title="Ajouter un truc à la liste"

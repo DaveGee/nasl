@@ -12,6 +12,9 @@ export default class CurrentList extends React.Component {
   }
   
   render() {
-    return <div>{this.state.listName}<br />{this.state.listId}</div>;
+    return <div className='current-list'>
+        {this.state.listName}<br />
+        {this.state.listId}
+      </div>;
   }
 }

@@ -5,7 +5,6 @@ import ProductService from '../../services/product-service';
 import Identity from '../../services/identity';
 import Config from '../../../config';
 
-
 // actions : 
 // sur tous : "je viens d'en acheter", "il en faut dès que possible"
 
@@ -95,6 +94,7 @@ export default class ProductList extends React.Component {
     return <div>
       <Header products={this.state.items.map(i => i.product.name)} 
               onProductSelected={this.handleNewProduct.bind(this)}
+              userInfos={Identity.User}
               />
       <ProductListView items={this.state.items} onItemStateChanged={this.reloadItemsDelayed.bind(this)} />
     </div >;

@@ -149,7 +149,7 @@ export default class ProductItem extends React.Component {
 
     return <ListItem key={this.props.item.product.id}
                      leftAvatar={this.state.loading ? <CircularProgress size={0.6}/> : 
-                                                      <Avatar style={glow} src={this.props.item.product.image} />}
+                                                      <Avatar style={glow}>{this.props.item.product.name[0]}</Avatar>}// src={this.props.item.product.image} />}
                      rightIconButton={rightIconMenu}
                      primaryText={<div className="item-title">
                                     {this.props.item.product.name}

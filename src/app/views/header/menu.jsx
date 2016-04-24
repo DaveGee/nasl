@@ -16,8 +16,10 @@ export default class Menu extends React.Component {
           docked={false}
           width={350}
         >
-        <User />
-        <CurrentList />
+        <div className='left-nav'>
+          <User userInfos={this.props.userInfos} />
+          <CurrentList {...this.props} />
+        </div>
       </LeftNav>;
   }
 }

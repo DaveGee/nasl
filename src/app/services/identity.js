@@ -26,8 +26,6 @@ class IdentityCache {
 
 const _cache = new IdentityCache();
 
-
-
 class Identity {
   get Cache() {
     return _cache;
