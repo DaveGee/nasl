@@ -1,6 +1,6 @@
-module.exports = {
-  env: 'dev', //dev|prod
-  
+process.env.NODE_ENV = 'development';
+
+module.exports = {  
   rootDir: './dist',
   
   libsDest: 'libs.js',

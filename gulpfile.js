@@ -12,6 +12,7 @@ var uglify = require('gulp-uglify');
 var htmlReplace = require('gulp-html-replace');
 var autoprefixer = require('gulp-autoprefixer');
 var cssBase64 = require('gulp-css-base64');
+var envify = require('envify/custom');
 
 gulp.task('libs', function() {
   var b = browserify({
@@ -38,14 +39,18 @@ gulp.task('build', function() {
   var build = browserify({
     entries: config.src.react,
     extensions: ['.jsx', '.js'],
-    debug: config.env !== 'prod'
+    debug: process.env.NODE_ENV !== 'production'
   })
+    .transform(envify({
+        _: 'purge',
+        NODE_ENV: process.env.NODE_ENV
+    }))
     .transform('babelify', { presets: ['es2015', 'react'] })
     .bundle()
     .on('error', prettyError)
     .pipe(source(config.bundleDest))
   
-  if(config.env === 'prod')
+  if(process.env.NODE_ENV === 'production')
     build = build
       .pipe(buffer())
       .pipe(uglify());
