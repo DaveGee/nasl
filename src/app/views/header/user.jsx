@@ -1,5 +1,6 @@
 import React from 'react';
 import Avatar from 'material-ui/Avatar';
+import {Card, CardHeader} from 'material-ui/Card';
 
 export default class User extends React.Component {
   constructor(props) {
@@ -10,12 +11,12 @@ export default class User extends React.Component {
   render() {
     var avatar = (this.props.userInfos.name || 'x')[0];
     
-    return <div className='user-profile'>
-      <Avatar>{avatar}</Avatar>
-        <h1>{this.props.userInfos.name || 'John Doe'}</h1>
-        <div>
-          {this.props.userInfos.email || 'jd@undefined.com'}
-        </div>
-      </div>;
+    return <Card className='user-profile'>
+        <CardHeader
+          title={this.props.userInfos.name || 'John Doe'}
+          subtitle={this.props.userInfos.email || 'jd@undefined.com'}
+          avatar="http://lorempixel.com/100/100/people/"
+        />
+      </Card>;
   }
 }
