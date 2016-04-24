@@ -20,7 +20,8 @@ export default class First extends React.Component {
       simple: true,
       message: props.message || '',
       name: props.name || '',
-      email: props.email || ''
+      email: props.email || '',
+      invalid: false
     };
   }
   
@@ -38,16 +39,28 @@ export default class First extends React.Component {
   nameChanged(event) {
     this.setState({
       name: event.target.value,
+      invalid: false
     });
   }
   
   emailChanged(event) {
     this.setState({
       email: event.target.value,
+      invalid: false
     });
   }
   
+  handleReturn(ev) {
+    if(ev.which === 13)
+      this.handleConnect();
+  }
+  
   handleConnect() {
+    if(!this.state.name || !this.state.email) {
+      this.setState({ invalid: true });
+      return;
+    }
+    
     var connectionInfos = {
       name: this.state.name,
       email: this.state.email,
@@ -58,25 +71,33 @@ export default class First extends React.Component {
   }
   
   render() {    
+    
+    let nameError = !this.state.name && this.state.invalid ? 'Cette info est vraiment nécessaire' : null;
+    let emailError = !this.state.email && this.state.invalid ? 'Cette info est vraiment nécessaire' : null;
+    
     return <div className='welcome-screen'>
         {this.state.message ? <div className='error'>{this.state.message}<Divider /></div> : ''}
         <h1>Hello!</h1>
         Pour continuer on a besoin au moins d'un nom et d'une adresse email
         <TextField 
-          hintText="Ton nom de scène" 
-          floatingLabelText="Ton nom" 
+          hintText='Ton nom de scène' 
+          floatingLabelText='Ton nom' 
+          errorText={nameError}
           fullWidth={true} 
           ref={(c) => this._nameCtrl = c}
           value={this.state.name}
           onChange={this.nameChanged.bind(this)}
+          onKeyDown={this.handleReturn.bind(this)}
           />
         <TextField
-          hintText="Adresse email"
-          floatingLabelText="Ton email"
+          hintText='Adresse email'
+          floatingLabelText='Ton email'
+          errorText={emailError}
           fullWidth={true}
           ref={(c) => this._emailCtrl = c}
           value={this.state.email}
           onChange={this.emailChanged.bind(this)}
+          onKeyDown={this.handleReturn.bind(this)}
           />
         <Toggle
           style={spaced}

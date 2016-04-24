@@ -16,8 +16,6 @@ import Config from './config';
 injectTapEventPlugin();
 
 const initApp = (userInfos) => {
-  console.log(userInfos);
-  
   Identity.clearToken();
   // register cache, change name, etc..
   if(userInfos) {
