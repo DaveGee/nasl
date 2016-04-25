@@ -18,7 +18,9 @@ export default class Menu extends React.Component {
         >
         <div className='left-nav'>
           <User userInfos={this.props.userInfos} />
-          <CurrentList {...this.props} />
+          <CurrentList {...this.props} 
+            colisted={['someone', 'john doe']} 
+            errorMessage={null} />
         </div>
       </LeftNav>;
   }

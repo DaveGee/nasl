@@ -83,8 +83,7 @@ export default class First extends React.Component {
           hintText='Ton nom de scène' 
           floatingLabelText='Ton nom' 
           errorText={nameError}
-          fullWidth={true} 
-          ref={(c) => this._nameCtrl = c}
+          fullWidth={true}
           value={this.state.name}
           onChange={this.nameChanged.bind(this)}
           onKeyDown={this.handleReturn.bind(this)}
@@ -94,7 +93,6 @@ export default class First extends React.Component {
           floatingLabelText='Ton email'
           errorText={emailError}
           fullWidth={true}
-          ref={(c) => this._emailCtrl = c}
           value={this.state.email}
           onChange={this.emailChanged.bind(this)}
           onKeyDown={this.handleReturn.bind(this)}

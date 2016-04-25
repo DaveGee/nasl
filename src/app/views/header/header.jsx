@@ -48,6 +48,10 @@ export default class Header extends React.Component {
   handleMenu(open) {
     this.setState({ menuOpen: open });
   }
+  
+  tmp_joinList(listName) {
+    console.log(listName);
+  }
 
   render() {
 
@@ -78,6 +82,7 @@ export default class Header extends React.Component {
       <Menu open={this.state.menuOpen}
             onRequestChange={this.handleMenu.bind(this)} 
             userInfos={this.props.userInfos}
+            onJoinList={this.tmp_joinList.bind(this)}
             />
       <Dialog
         title="Ajouter un truc à la liste"
