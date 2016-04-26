@@ -1,5 +1,7 @@
 var Config = {
 
+  anonymousPassword: 'defaultpasswordforanonymousaccess',
+  
   defaultPageSize: 100,
 
   refreshInterval: 1200,
