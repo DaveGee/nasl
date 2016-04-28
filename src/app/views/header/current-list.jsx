@@ -6,17 +6,20 @@ import CircularProgress from 'material-ui/CircularProgress';
 import {List, ListItem} from 'material-ui/List';
 import Avatar from 'material-ui/Avatar';
 import Subheader from 'material-ui/Subheader';
+import atomicCounter from '../../helpers/counter';
 
 const spaced = {
   margin: '20px 0'
 };
+
+const newRef = () => atomicCounter(10000);
 
 export default class CurrentList extends React.Component {
   constructor(props) {
     super(props);
     
     this.state = {
-      listName: props.userInfos.list.humanRef,
+      listName: props.userInfos.list.humanRef || newRef(),
       joinListName: '',
       join: false
     };
@@ -55,7 +58,7 @@ export default class CurrentList extends React.Component {
            />
         <List>
           <Subheader>Les personnes qui utilisent ma liste :</Subheader>
-          {this.props.colisted.map(c => 
+          {this.props.otherListUsers.map(c => 
             <ListItem key={c} primaryText={c}
                       leftAvatar={<Avatar src='http://lorempixel.com/100/100/people/' />}
                       /> 

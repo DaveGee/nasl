@@ -37,7 +37,8 @@ export default class ProductList extends React.Component {
     super(props);
 
     this.state = {
-      items: []
+      items: [],
+      otherListUsers: []
     };
   }
   
@@ -84,19 +85,32 @@ export default class ProductList extends React.Component {
     }, Config.refreshInterval);
   }
   
-  handleNewProduct(product) {
-    // add product to cache
-    this._products.push(product);
-    this.reloadItemsDelayed();
+  addItem(selected) {
+    ProductService.addProduct(selected)
+      .then(p => this._products.push(p))
+      .then(() => this.reloadItemsDelayed());
+  }
+  
+  joinList() {
+    console.log('join list');
+  }
+  
+  componentDidMount() {
+    // load additional things
+    console.log('load others on the list');
+    this.setState({ otherListUsers: ['Arya', 'Robb', 'Ned'] });
   }
 
   render() {
     return <div>
-      <Header products={this.state.items.map(i => i.product.name)} 
-              onProductSelected={this.handleNewProduct.bind(this)}
+      <Header products={this.state.items.map(i => i.product.name)}
               userInfos={Identity.User}
+              onAddItem={this.addItem.bind(this)}
+              onJoinList={this.joinList.bind(this)}
+              otherListUsers={this.state.otherListUsers}
               />
-      <ProductListView items={this.state.items} onItemStateChanged={this.reloadItemsDelayed.bind(this)} />
+      <ProductListView items={this.state.items} 
+                       onItemStateChanged={this.reloadItemsDelayed.bind(this)} />
     </div >;
   }
 }

@@ -63,7 +63,7 @@ class ProductService {
     else
       return B.update('users', Identity.User.userId, {
         list: {
-          humanRef: Identity.User.name + '\'s list',
+          humanRef: null,
           items: [],
           ___class: 'lists'
         }

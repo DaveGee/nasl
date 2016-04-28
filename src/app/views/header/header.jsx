@@ -4,7 +4,6 @@ import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/dialog';
 import FlatButton from 'material-ui/FlatButton';
 import AutoComplete from 'material-ui/AutoComplete';
-import ProductService from '../../services/product-service';
 import Menu from './menu';
 
 
@@ -23,12 +22,6 @@ export default class Header extends React.Component {
     };
   }
 
-  addItem(selected) {
-    ProductService.addProduct(selected)
-      .then(p => this.props.onProductSelected(p));
-    this.closeDialog();
-  }
-
   openDialogAdd() {
     this.setState({ addingItem: true });
   }
@@ -37,20 +30,13 @@ export default class Header extends React.Component {
     this.setState({ addingItem: false });
   }
   
-  handleRequest(selected) {
-    this.addItem(selected);
-  }
-  
-  handleDialogOk() {
-    this.addItem(this._autoComplete.state.searchText);
+  handleAddItem(selected) {
+    this.props.onAddItem(selected || this._autoComplete.state.searchText);
+    this.closeDialog();
   }
   
   handleMenu(open) {
     this.setState({ menuOpen: open });
-  }
-  
-  tmp_joinList(listName) {
-    console.log(listName);
   }
 
   render() {
@@ -70,7 +56,7 @@ export default class Header extends React.Component {
         label="Ajouter"
         primary={true}
         keyboardFocused={true}
-        onTouchTap={this.handleDialogOk.bind(this) }
+        onTouchTap={this.handleAddItem.bind(this) }
         />,
     ];
 
@@ -82,7 +68,8 @@ export default class Header extends React.Component {
       <Menu open={this.state.menuOpen}
             onRequestChange={this.handleMenu.bind(this)} 
             userInfos={this.props.userInfos}
-            onJoinList={this.tmp_joinList.bind(this)}
+            onJoinList={this.props.onJoinList}
+            otherListUsers={this.props.otherListUsers}
             />
       <Dialog
         title="Ajouter un truc à la liste"
@@ -93,7 +80,7 @@ export default class Header extends React.Component {
         contentStyle={dialogStyle}
         >
         <AutoComplete
-          onNewRequest={this.handleRequest.bind(this)}
+          onNewRequest={this.handleAddItem.bind(this)}
           maxSearchResults={5}
           hintText="De quoi avez-vous besoin ?"
           dataSource={this.props.products }
