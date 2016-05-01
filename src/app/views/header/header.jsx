@@ -37,6 +37,10 @@ export default class Header extends React.Component {
   
   handleMenu(open) {
     this.setState({ menuOpen: open });
+    if(open)
+      this._poll = setInterval(this.props.onRefreshUsers, 1000);
+    else if(this._poll)
+      clearInterval(this._poll);
   }
 
   render() {

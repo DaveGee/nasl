@@ -98,16 +98,16 @@ class Backendless {
   create(tableName, item) {
     return fetch(`${this.root}/data/${tableName}`, {
       method: 'post',
-      headers: Object.assign({}, Config.backendless.headers, {"user-token": this.getUserToken()}),
+      headers: Object.assign({}, Config.backendless.headers, {'user-token': this.getUserToken()}),
       body: JSON.stringify(item)
     })
     .then(response => response.json());
   }
   
-  fetchOne(table, id) {
-    return fetch(`${this.root}/data/${table}/${id}`, 
+  fetchOne(table, id, relationsDepth = null) {
+    return fetch(`${this.root}/data/${table}/${id}` + (relationsDepth ? '?relationsDepth=' + relationsDepth : ''), 
       {
-        headers: Object.assign({}, Config.backendless.headers, {"user-token": this.getUserToken()})
+        headers: Object.assign({}, Config.backendless.headers, {'user-token': this.getUserToken()})
       })
       .then(res => res.json());
   }
@@ -122,7 +122,7 @@ class Backendless {
   */
   fetch(params, all = true) {
     let reqParams = {
-      headers: Object.assign({}, Config.backendless.headers, {"user-token": this.getUserToken()})
+      headers: Object.assign({}, Config.backendless.headers, {'user-token': this.getUserToken()})
     };
     let props = params.props ? '&props=' + params.props.join(',') : '';
     let sort = params.order ? '&sortBy=' + params.order.join(',') : '';

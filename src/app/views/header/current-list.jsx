@@ -47,27 +47,30 @@ export default class CurrentList extends React.Component {
   }
   
   render() {
-    
-    var Share = this.state.join ? null : 
+        
+    const Share = this.state.join ? null : 
       <div>
         <TextField
            disabled={true}
            value={this.state.listName}
            fullWidth={true}
-           floatingLabelText='Mon code secret'
+           floatingLabelText='Code de ma liste'
            />
-        <List>
-          <Subheader>Les personnes qui utilisent ma liste :</Subheader>
-          {this.props.otherListUsers.map(c => 
-            <ListItem key={c} primaryText={c}
-                      leftAvatar={<Avatar src='http://lorempixel.com/100/100/people/' />}
-                      /> 
-          )}
-        </List>
+        {this.props.otherListUsers && this.props.otherListUsers.length > 0 ?
+          <List>
+            <Subheader>Les personnes qui utilisent ma liste :</Subheader>
+            {this.props.otherListUsers.map(c => 
+              <ListItem key={c} primaryText={c}
+                        leftAvatar={<Avatar src='http://lorempixel.com/100/100/people/' />}
+                        /> 
+            )}
+          </List>
+          : null
+        }
       </div>;
 
     var codeError = '';
-    var Join = this.state.join ? <div>
+    const Join = this.state.join ? <div>
         <TextField
           hintText='Code secret de sa liste'
           floatingLabelText='Code secret de sa liste'
@@ -86,7 +89,7 @@ export default class CurrentList extends React.Component {
           />
       </div> : null;
     
-    var Error = this.props.errorMessage ? <div className='error'>{errorMessage}</div> : null;
+    const Error = this.props.errorMessage ? <div className='error'>{errorMessage}</div> : null;
     
     return <div className='current-list'>
         {Error}

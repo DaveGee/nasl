@@ -96,9 +96,15 @@ export default class ProductList extends React.Component {
   }
   
   componentDidMount() {
+    this.refreshUsers();
+  }
+  
+  refreshUsers() {
+    console.log('refresh');
     // load additional things
     console.log('load others on the list');
-    this.setState({ otherListUsers: ['Arya', 'Robb', 'Ned'] });
+    Identity.getListParticipants()
+      .then(names => this.setState({ otherListUsers: names }));
   }
 
   render() {
@@ -108,6 +114,7 @@ export default class ProductList extends React.Component {
               onAddItem={this.addItem.bind(this)}
               onJoinList={this.joinList.bind(this)}
               otherListUsers={this.state.otherListUsers}
+              onRefreshUsers={() => this.refreshUsers()}
               />
       <ProductListView items={this.state.items} 
                        onItemStateChanged={this.reloadItemsDelayed.bind(this)} />

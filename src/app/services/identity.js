@@ -49,8 +49,18 @@ class Identity {
     this._user.list = list;
   }
   
+  getListParticipants() {
+    return B.fetch({
+      table: 'users',
+      where: `list.objectId='${this._user.list.objectId}'`,
+      props: ['objectId', 'name', 'email']
+    })
+    .then(res => res.map(u => u.name));
+  }
+  
   auth(email, password) {
     return B.login({ login: email, password: password || Config.anonymousPassword })
+      .then(data => B.fetchOne('users', data.objectId, 1))
       .then(data => this._user = data);
   }
 }
